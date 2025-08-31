@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # Database
   postgres:
@@ -29,6 +27,7 @@ services:
   # Application
   app:
     image: ghcr.io/polaroi8d/cactoide/cactoide:${APP_VERSION:-latest}
+    build: .
     container_name: cactoide-app
     ports:
       - '${PORT:-5111}:3000'
