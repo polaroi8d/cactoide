@@ -40,6 +40,7 @@
 	"dependencies": {
 		"@sveltejs/adapter-node": "^5.3.1",
 		"drizzle-orm": "^0.44.5",
+		"fuse.js": "^7.1.0",
 		"postgres": "^3.4.7"
 	}
 }
