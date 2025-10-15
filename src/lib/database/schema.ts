@@ -16,7 +16,7 @@ import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 
 // --- Enums (matching the SQL CHECK constraints)
 export const eventTypeEnum = pgEnum('event_type', ['limited', 'unlimited']);
-export const visibilityEnum = pgEnum('visibility', ['public', 'private']);
+export const visibilityEnum = pgEnum('visibility', ['public', 'private', 'invite-only']);
 export const locationTypeEnum = pgEnum('location_type', ['none', 'text', 'maps']);
 
 // --- Events table
@@ -71,11 +71,31 @@ export const rsvps = pgTable(
 	})
 );
 
+// --- Invite Tokens table
+export const inviteTokens = pgTable(
+	'invite_tokens',
+	{
+		id: uuid('id').defaultRandom().primaryKey(),
+		eventId: varchar('event_id', { length: 8 })
+			.notNull()
+			.references(() => events.id, { onDelete: 'cascade' }),
+		token: varchar('token', { length: 32 }).notNull().unique(),
+		expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+		createdAt: timestamp('created_at', { withTimezone: true }).defaultNow()
+	},
+	(t) => ({
+		idxInviteTokensEventId: index('idx_invite_tokens_event_id').on(t.eventId),
+		idxInviteTokensToken: index('idx_invite_tokens_token').on(t.token),
+		idxInviteTokensExpiresAt: index('idx_invite_tokens_expires_at').on(t.expiresAt)
+	})
+);
+
 // --- Relations (optional but handy for type safety)
 import { relations } from 'drizzle-orm';
 
 export const eventsRelations = relations(events, ({ many }) => ({
-	rsvps: many(rsvps)
+	rsvps: many(rsvps),
+	inviteTokens: many(inviteTokens)
 }));
 
 export const rsvpsRelations = relations(rsvps, ({ one }) => ({
@@ -85,16 +105,30 @@ export const rsvpsRelations = relations(rsvps, ({ one }) => ({
 	})
 }));
 
+export const inviteTokensRelations = relations(inviteTokens, ({ one }) => ({
+	event: one(events, {
+		fields: [inviteTokens.eventId],
+		references: [events.id]
+	})
+}));
+
 // --- Inferred types for use in the application
 export type Event = InferSelectModel<typeof events>;
 export type NewEvent = InferInsertModel<typeof events>;
 export type Rsvp = InferSelectModel<typeof rsvps>;
 export type NewRsvp = InferInsertModel<typeof rsvps>;
+export type InviteToken = InferSelectModel<typeof inviteTokens>;
+export type NewInviteToken = InferInsertModel<typeof inviteTokens>;
 
 // --- Additional utility types
 export type EventWithRsvps = Event & {
 	rsvps: Rsvp[];
 };
 
+export type EventWithInviteTokens = Event & {
+	inviteTokens: InviteToken[];
+};
+
 export type CreateEventData = Omit<NewEvent, 'id' | 'createdAt' | 'updatedAt'>;
 export type CreateRsvpData = Omit<NewRsvp, 'id' | 'createdAt'>;
+export type CreateInviteTokenData = Omit<NewInviteToken, 'id' | 'createdAt'>;

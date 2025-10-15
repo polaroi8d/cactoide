@@ -1,5 +1,5 @@
 import { database } from '$lib/database/db';
-import { events } from '$lib/database/schema';
+import { events, inviteTokens } from '$lib/database/schema';
 import { eq, and } from 'drizzle-orm';
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
@@ -23,8 +23,29 @@ export const load: PageServerLoad = async ({ params, cookies }) => {
 		throw redirect(303, '/event');
 	}
 
+	// Fetch invite token if this is an invite-only event
+	let inviteToken = null;
+	if (event[0].visibility === 'invite-only') {
+		const tokenData = await database
+			.select()
+			.from(inviteTokens)
+			.where(eq(inviteTokens.eventId, eventId))
+			.limit(1);
+
+		if (tokenData.length > 0) {
+			inviteToken = {
+				id: tokenData[0].id,
+				event_id: tokenData[0].eventId,
+				token: tokenData[0].token,
+				expires_at: tokenData[0].expiresAt.toISOString(),
+				created_at: tokenData[0].createdAt?.toISOString() || new Date().toISOString()
+			};
+		}
+	}
+
 	return {
-		event: event[0]
+		event: event[0],
+		inviteToken
 	};
 };
 

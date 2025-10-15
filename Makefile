@@ -1,67 +1,94 @@
-.PHONY: help build up db-only logs db-clean prune i18n lint format
+# Cactoide Makefile
+# Database and application management commands
+
+.PHONY: help migrate-up migrate-down db-reset dev build test
 
 # Default target
 help:
-	@echo "Cactoide Commands"
-	@echo ""
-	@echo "Main commands:"
-	@echo "  make build    - Build the Docker images"
-	@echo "  make up       - Start all services (database + app)"
-	@echo ""
-	@echo "Individual services:"
-	@echo "  make db-only  - Start only the database"
-	@echo ""
-	@echo "Utility commands:"
-	@echo "  make logs     - Show logs from all services"
-	@echo "  make db-clean  - Stop & remove database container"
-	@echo "  make prune    - Remove all containers, images, and volumes"
-	@echo "  make i18n - Validate translation files against messages.json"
-	@echo "  make help     - Show this help message"
+	@echo "Available commands:"
+	@echo "  migrate-up      - Apply invite-only events migration"
+	@echo "  migrate-down    - Rollback invite-only events migration"
+	@echo "  db-reset        - Reset database to initial state"
+	@echo "  dev             - Start development server"
+	@echo "  build           - Build the application"
+	@echo "  test            - Run tests"
 
-# Build the Docker images
-build:
-	@echo "Building Docker images..."
-	docker compose build
+# Database connection variables
+DB_HOST ?= localhost
+DB_PORT ?= 5432
+DB_NAME ?= cactoide_database
+DB_USER ?= cactoide
+DB_PASSWORD ?= cactoide_password
 
-# Start all services
-up:
-	@echo "Starting all services..."
-	docker compose up -d
+# Migration variables
+MIGRATIONS_DIR = database/migrations
 
-# Start only the database
-db-only:
-	@echo "Starting only the database..."
-	docker compose up -d postgres
+# Database connection string
+DB_URL = postgresql://$(DB_USER):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)
 
-# Show logs from all services
-logs:
-	@echo "Showing logs from all services..."
-	docker compose logs -f
-
-db-clean:
-	@echo "Cleaning up all Docker resources..."
-	docker stop cactoide-db && docker rm cactoide-db && docker volume prune -f && docker network prune -f
-
-# Clean up everything (containers, images, volumes)
-prune:
-	@echo "Cleaning up all Docker resources..."
-	docker compose down -v --rmi all
-
-# Validate translation files
-i18n:
-	@echo "Validating translation files..."
-	@if [ -n "$(FILE)" ]; then \
-		./scripts/i18n-check.sh $(FILE); \
+# Apply invite-only events migration
+migrate-up:
+	@echo "Applying invite-only events migration..."
+	@if [ -f "$(MIGRATIONS_DIR)/20241220_001_add_invite_only_events.sql" ]; then \
+		psql "$(DB_URL)" -f "$(MIGRATIONS_DIR)/20241220_001_add_invite_only_events.sql" && \
+		echo "Migration applied successfully!"; \
 	else \
-		./scripts/i18n-check.sh; \
+		echo "Migration file not found: $(MIGRATIONS_DIR)/20241220_001_add_invite_only_events.sql"; \
+		exit 1; \
 	fi
 
-lint:
-	@echo "Linting the project..."
-	npm run lint
+# Rollback invite-only events migration
+migrate-down:
+	@echo "Rolling back invite-only events migration..."
+	@if [ -f "$(MIGRATIONS_DIR)/20241220_001_add_invite_only_events_rollback.sql" ]; then \
+		psql "$(DB_URL)" -f "$(MIGRATIONS_DIR)/20241220_001_add_invite_only_events_rollback.sql" && \
+		echo "Migration rolled back successfully!"; \
+	else \
+		echo "Rollback file not found: $(MIGRATIONS_DIR)/20241220_001_add_invite_only_events_rollback.sql"; \
+		exit 1; \
+	fi
 
-format:
-	@echo "Formatting the project..."
-	npm run format
+# Reset database to initial state
+db-reset:
+	@echo "Resetting database..."
+	@psql "$(DB_URL)" -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public; GRANT ALL ON SCHEMA public TO postgres; GRANT ALL ON SCHEMA public TO public;"
+	@psql "$(DB_URL)" -f database/init.sql
+	@echo "Database reset complete!"
 
+# Development server
+dev:
+	@echo "Starting development server..."
+	npm run dev
 
+# Build application
+build:
+	@echo "Building application..."
+	npm run build
+
+# Run tests
+test:
+	@echo "Running tests..."
+	npm run test
+
+# Install dependencies
+install:
+	@echo "Installing dependencies..."
+	npm install
+
+# Docker commands
+docker-build:
+	@echo "Building Docker image..."
+	docker build -t cactoide .
+
+docker-run:
+	@echo "Running Docker container..."
+	docker run -p 3000:3000 cactoide
+
+# Database setup for development
+db-setup: install db-reset migrate-up
+	@echo "Database setup complete!"
+
+# Full development setup
+setup: install db-setup
+	@echo "Development environment ready!"
+	@echo "Run 'make dev' to start the development server"

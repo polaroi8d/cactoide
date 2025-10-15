@@ -324,6 +324,16 @@
 											{event.type === 'limited' ? t('common.limited') : t('common.unlimited')}
 										</span>
 									</div>
+									<div class="flex items-center space-x-2">
+										<span
+											class="rounded-sm border px-2 py-1 text-xs font-medium {event.visibility ===
+											'public'
+												? 'border-teal-500 text-teal-500'
+												: 'border-amber-600 text-amber-600'}"
+										>
+											{event.visibility === 'public' ? t('common.public') : t('common.inviteOnly')}
+										</span>
+									</div>
 								</div>
 							</div>
 

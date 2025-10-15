@@ -1,39 +1,50 @@
 import { database } from '$lib/database/db';
 import { events, rsvps, inviteTokens } from '$lib/database/schema';
-import { eq, asc, and } from 'drizzle-orm';
+import { eq, and, asc } from 'drizzle-orm';
 import { error, fail } from '@sveltejs/kit';
 import type { PageServerLoad, Actions } from './$types';
 import { isTokenValid } from '$lib/inviteTokenHelpers.js';
 
 export const load: PageServerLoad = async ({ params, cookies }) => {
 	const eventId = params.id;
+	const token = params.token;
 
-	if (!eventId) {
-		throw error(404, 'EventId not found');
+	if (!eventId || !token) {
+		throw error(404, 'Event or token not found');
 	}
 
 	try {
-		// Fetch event and RSVPs in parallel
-		const [eventData, rsvpData] = await Promise.all([
+		// Fetch event, RSVPs, and invite token in parallel
+		const [eventData, rsvpData, tokenData] = await Promise.all([
 			database.select().from(events).where(eq(events.id, eventId)).limit(1),
-			database.select().from(rsvps).where(eq(rsvps.eventId, eventId)).orderBy(asc(rsvps.createdAt))
+			database.select().from(rsvps).where(eq(rsvps.eventId, eventId)).orderBy(asc(rsvps.createdAt)),
+			database
+				.select()
+				.from(inviteTokens)
+				.where(and(eq(inviteTokens.eventId, eventId), eq(inviteTokens.token, token)))
+				.limit(1)
 		]);
 
 		if (!eventData[0]) {
 			throw error(404, 'Event not found');
 		}
 
+		if (!tokenData[0]) {
+			throw error(404, 'Invalid invite token');
+		}
+
 		const event = eventData[0];
 		const eventRsvps = rsvpData;
+		const inviteToken = tokenData[0];
 
-		// Check if this is an invite-only event
-		if (event.visibility === 'invite-only') {
-			// For invite-only events, check if user is the event creator
-			const userId = cookies.get('cactoideUserId');
-			if (event.userId !== userId) {
-				// User is not the creator, redirect to a message about needing invite
-				throw error(403, 'This event requires an invite link to view');
-			}
+		// Check if token is still valid
+		if (!isTokenValid(inviteToken.expiresAt.toISOString())) {
+			throw error(410, 'Invite token has expired');
+		}
+
+		// Check if event is invite-only
+		if (event.visibility !== 'invite-only') {
+			throw error(403, 'This event does not require an invite');
 		}
 
 		// Transform the data to match the expected interface
@@ -66,12 +77,19 @@ export const load: PageServerLoad = async ({ params, cookies }) => {
 		return {
 			event: transformedEvent,
 			rsvps: transformedRsvps,
-			userId: userId
+			userId: userId,
+			inviteToken: {
+				id: inviteToken.id,
+				event_id: inviteToken.eventId,
+				token: inviteToken.token,
+				expires_at: inviteToken.expiresAt.toISOString(),
+				created_at: inviteToken.createdAt?.toISOString() || new Date().toISOString()
+			}
 		};
 	} catch (err) {
-		if (err instanceof Response) throw err; // This is the 404 error
+		if (err instanceof Response) throw err; // This is the 404/410/403 error
 
-		console.error('Error loading event:', err);
+		console.error('Error loading invite-only event:', err);
 		throw error(500, 'Failed to load event');
 	}
 };
@@ -79,6 +97,7 @@ export const load: PageServerLoad = async ({ params, cookies }) => {
 export const actions: Actions = {
 	addRSVP: async ({ request, params, cookies }) => {
 		const eventId = params.id;
+		const token = params.token;
 		const formData = await request.formData();
 
 		const name = formData.get('newAttendeeName') as string;
@@ -90,15 +109,21 @@ export const actions: Actions = {
 		}
 
 		try {
+			// Verify the invite token is still valid
+			const [tokenData] = await database
+				.select()
+				.from(inviteTokens)
+				.where(and(eq(inviteTokens.eventId, eventId), eq(inviteTokens.token, token)))
+				.limit(1);
+
+			if (!tokenData || !isTokenValid(tokenData.expiresAt.toISOString())) {
+				return fail(403, { error: 'Invalid or expired invite token' });
+			}
+
 			// Check if event exists and get its details
 			const [eventData] = await database.select().from(events).where(eq(events.id, eventId));
 			if (!eventData) {
 				return fail(404, { error: 'Event not found' });
-			}
-
-			// Check if this is an invite-only event
-			if (eventData.visibility === 'invite-only') {
-				return fail(403, { error: 'This event requires an invite link to RSVP' });
 			}
 
 			// Get current RSVPs
@@ -151,17 +176,44 @@ export const actions: Actions = {
 		}
 	},
 
-	removeRSVP: async ({ request }) => {
+	removeRSVP: async ({ request, params, cookies }) => {
+		const eventId = params.id;
+		const token = params.token;
 		const formData = await request.formData();
 
 		const rsvpId = formData.get('rsvpId') as string;
+		const userId = cookies.get('cactoideUserId');
 
-		if (!rsvpId) {
-			return fail(400, { error: 'RSVP ID is required' });
+		if (!rsvpId || !userId) {
+			return fail(400, { error: 'RSVP ID and user ID are required' });
 		}
 
 		try {
+			// Verify the invite token is still valid
+			const [tokenData] = await database
+				.select()
+				.from(inviteTokens)
+				.where(and(eq(inviteTokens.eventId, eventId), eq(inviteTokens.token, token)))
+				.limit(1);
+
+			if (!tokenData || !isTokenValid(tokenData.expiresAt.toISOString())) {
+				return fail(403, { error: 'Invalid or expired invite token' });
+			}
+
+			// Check if RSVP exists and belongs to the user
+			const [rsvpData] = await database
+				.select()
+				.from(rsvps)
+				.where(and(eq(rsvps.id, rsvpId), eq(rsvps.eventId, eventId), eq(rsvps.userId, userId)))
+				.limit(1);
+
+			if (!rsvpData) {
+				return fail(404, { error: 'RSVP not found or you do not have permission to remove it' });
+			}
+
+			// Delete the RSVP
 			await database.delete(rsvps).where(eq(rsvps.id, rsvpId));
+
 			return { success: true, type: 'remove' };
 		} catch (err) {
 			console.error('Error removing RSVP:', err);
