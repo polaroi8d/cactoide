@@ -41,7 +41,6 @@
 		"numberOfGuests": "Numero di Ospiti",
 		"addGuests": "Aggiungi ospiti",
 		"joinEvent": "Partecipa all'Evento",
-		"copyLink": "Copia Link",
 		"addToCalendar": "Aggiungi al Calendario",
 		"close": "Chiudi",
 		"closeModal": "Chiudi finestra",
@@ -64,7 +63,6 @@
 		"eventNotFound": "Evento Non Trovato",
 		"eventIsFull": "L'Evento è Pieno!",
 		"maximumCapacityReached": "Raggiunta la capacità massima",
-		"eventLinkCopied": "Link dell'evento copiato negli appunti!",
 		"rsvpAddedSuccessfully": "RSVP aggiunto con successo!",
 		"removedRsvpSuccessfully": "RSVP rimosso con successo.",
 		"anUnexpectedErrorOccurred": "Si è verificato un errore inaspettato.",
@@ -188,8 +186,10 @@
 		"noAttendeesYet": "Ancora nessun partecipante",
 		"beFirstToJoin": "Sii il primo a partecipare!",
 		"copyLinkButton": "Copia Link",
+		"copyInviteLinkButton": "Copia Link Invito",
 		"addToCalendarButton": "Aggiungi al Calendario",
 		"eventLinkCopied": "Link dell'evento copiato negli appunti!",
+		"inviteLinkCopied": "Link invito copiato negli appunti!",
 		"rsvpAddedSuccessfully": "RSVP aggiunto con successo!",
 		"removedRsvpSuccessfully": "RSVP rimosso con successo.",
 		"failedToAddRsvp": "Impossibile aggiungere RSVP",
@@ -208,7 +208,8 @@
 		"viewEventAriaLabel": "Visualizza evento",
 		"editEventAriaLabel": "Modifica evento",
 		"deleteEventAriaLabel": "Elimina evento",
-		"removeRsvpAriaLabel": "Rimuovi RSVP"
+		"removeRsvpAriaLabel": "Rimuovi RSVP",
+		"inviteLinkExpiresAt": "Questo link scade quando l'evento inizia: {time}"
 	},
 	"discover": {
 		"title": "Scopri Eventi - Cactoide",

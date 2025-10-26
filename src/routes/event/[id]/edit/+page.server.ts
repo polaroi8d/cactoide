@@ -45,7 +45,8 @@ export const load: PageServerLoad = async ({ params, cookies }) => {
 
 	return {
 		event: event[0],
-		inviteToken
+		inviteToken,
+		userId
 	};
 };
 

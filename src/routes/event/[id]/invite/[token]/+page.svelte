@@ -27,6 +27,7 @@
 	$: event = data.event;
 	$: rsvps = data.rsvps;
 	$: currentUserId = data.userId;
+	$: isEventCreator = event.user_id === currentUserId;
 
 	// Create calendar event object when event data changes
 	$: if (event && browser) {
@@ -58,7 +59,7 @@
 	const token = $page.params.token || '';
 
 	const copyInviteLink = () => {
-		if (browser) {
+		if (browser && isEventCreator) {
 			const url = `${$page.url.origin}/event/${eventId}/invite/${token}`;
 			navigator.clipboard.writeText(url).then(() => {
 				success = 'Invite link copied to clipboard!';
@@ -415,7 +416,10 @@
 				<div class="max-w-2xl space-y-3">
 					<button
 						on:click={copyInviteLink}
-						class="hover:bg-violet-400/70' w-full rounded-sm border-2 border-violet-500 bg-violet-400/20 px-4 py-3 py-4 font-bold font-medium font-semibold text-white shadow-lg transition-all duration-200 hover:scale-105"
+						disabled={!isEventCreator}
+						class="w-full rounded-sm border-2 px-4 py-3 py-4 font-bold font-medium font-semibold text-white shadow-lg transition-all duration-200 hover:scale-105 {isEventCreator
+							? 'border-violet-500 bg-violet-400/20 hover:bg-violet-400/70'
+							: 'cursor-not-allowed border-gray-500 bg-gray-600/20 hover:bg-gray-600/30'}"
 					>
 						{t('event.copyInviteLinkButton')}
 					</button>

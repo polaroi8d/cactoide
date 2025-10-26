@@ -1,17 +1,4 @@
-# Cactoide Makefile
-# Database and application management commands
-
-.PHONY: help migrate-up migrate-down db-reset dev build test
-
-# Default target
-help:
-	@echo "Available commands:"
-	@echo "  migrate-up      - Apply invite-only events migration"
-	@echo "  migrate-down    - Rollback invite-only events migration"
-	@echo "  db-reset        - Reset database to initial state"
-	@echo "  dev             - Start development server"
-	@echo "  build           - Build the application"
-	@echo "  test            - Run tests"
+.PHONY: help build up down db-only logs db-clean prune i18n lint format migrate-up migrate-down
 
 # Database connection variables
 DB_HOST ?= localhost
@@ -25,6 +12,21 @@ MIGRATIONS_DIR = database/migrations
 
 # Database connection string
 DB_URL = postgresql://$(DB_USER):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)
+
+help:
+	@echo "Available commands:"
+	@echo "  build           - Docker build the application"
+	@echo "  up              - Start all services"
+	@echo "  down            - Stop all services"
+	@echo "  db-only         - Start only the database"
+	@echo "  logs            - Show logs from all services"
+	@echo "  db-clean        - Clean up all Docker resources"
+	@echo "  prune           - Clean up everything (containers, images, volumes)"
+	@echo "  i18n            - Validate translation files"
+	@echo "  lint            - Lint the project"
+	@echo "  format          - Format the project"
+	@echo "  migrate-up      - Apply invite-only events migration"
+	@echo "  migrate-down    - Rollback invite-only events migration"
 
 # Apply invite-only events migration
 migrate-up:
@@ -48,47 +50,52 @@ migrate-down:
 		exit 1; \
 	fi
 
-# Reset database to initial state
-db-reset:
-	@echo "Resetting database..."
-	@psql "$(DB_URL)" -c "DROP SCHEMA public CASCADE; CREATE SCHEMA public; GRANT ALL ON SCHEMA public TO postgres; GRANT ALL ON SCHEMA public TO public;"
-	@psql "$(DB_URL)" -f database/init.sql
-	@echo "Database reset complete!"
-
-# Development server
-dev:
-	@echo "Starting development server..."
-	npm run dev
-
-# Build application
+# Build the Docker images
 build:
-	@echo "Building application..."
-	npm run build
+	@echo "Building Docker images..."
+	docker compose build
 
-# Run tests
-test:
-	@echo "Running tests..."
-	npm run test
+# Start all services
+up:
+	@echo "Starting all services..."
+	docker compose up -d
 
-# Install dependencies
-install:
-	@echo "Installing dependencies..."
-	npm install
+down:
+	@echo "Stopping all services..."
+	docker compose down
 
-# Docker commands
-docker-build:
-	@echo "Building Docker image..."
-	docker build -t cactoide .
+db-clean:
+	@echo "Cleaning up all Docker resources..."
+	docker stop cactoide-db && docker rm cactoide-db && docker volume prune -f && docker network prune -f
 
-docker-run:
-	@echo "Running Docker container..."
-	docker run -p 3000:3000 cactoide
+# Start only the database
+db-only:
+	@echo "Starting only the database..."
+	docker compose up -d postgres
 
-# Database setup for development
-db-setup: install db-reset migrate-up
-	@echo "Database setup complete!"
+# Show logs from all services
+logs:
+	@echo "Showing logs from all services..."
+	docker compose logs -f
 
-# Full development setup
-setup: install db-setup
-	@echo "Development environment ready!"
-	@echo "Run 'make dev' to start the development server"
+
+
+# Clean up everything (containers, images, volumes)
+prune:
+	@echo "Cleaning up all Docker resources..."
+	docker compose down -v --rmi all
+
+
+lint:
+	@echo "Linting the project..."
+	npm run lint
+
+format:
+	@echo "Formatting the project..."
+	npm run format
+
+#TODO: not working yet
+i18n:
+	@echo "Validating translation files..."
+	@if [ -n "$(FILE)" ]; then \
+		./scripts/i18n-check.sh $(FILE); \

@@ -23,7 +23,8 @@
 	let isSubmitting = false;
 	let inviteToken = data.inviteToken;
 
-	let inviteLinkCopied = false;
+	let showInviteLinkToast = false;
+	let toastHideTimer: number | null = null;
 
 	// Get today's date in YYYY-MM-DD format for min attribute
 	const today = new Date().toISOString().split('T')[0];
@@ -76,9 +77,12 @@
 			const inviteUrl = `${window.location.origin}/event/${data.event.id}/invite/${inviteToken.token}`;
 			try {
 				await navigator.clipboard.writeText(inviteUrl);
-				inviteLinkCopied = true;
-				setTimeout(() => {
-					inviteLinkCopied = false;
+				showInviteLinkToast = true;
+
+				// Auto-hide toast after 3 seconds
+				if (toastHideTimer) clearTimeout(toastHideTimer);
+				toastHideTimer = window.setTimeout(() => {
+					showInviteLinkToast = false;
 				}, 3000);
 			} catch (err) {
 				console.error('Failed to copy invite link:', err);
@@ -375,8 +379,8 @@
 						</fieldset>
 					</div>
 
-					<!-- Invite Link Section (only for invite-only events) -->
-					{#if eventData.visibility === 'invite-only' && inviteToken}
+					<!-- Invite Link Section (only for invite-only events and event creator) -->
+					{#if eventData.visibility === 'invite-only' && inviteToken && data.event.userId === data.userId}
 						<div class="rounded-sm border border-amber-500/30 bg-amber-900/20 p-4">
 							<div class="mb-3 flex items-center justify-between">
 								<h3 class="text-lg font-semibold text-amber-400">Invite Link</h3>
@@ -395,7 +399,7 @@
 										on:click={copyInviteLink}
 										class="rounded-sm border border-amber-300 bg-amber-200 px-3 py-2 text-sm font-medium text-amber-900 hover:bg-amber-300"
 									>
-										{inviteLinkCopied ? t('common.success') : t('common.copyLink')}
+										{t('event.copyInviteLinkButton')}
 									</button>
 								</div>
 								<p class="text-xs text-amber-300">
@@ -436,3 +440,12 @@
 		</div>
 	</div>
 </div>
+
+<!-- Invite Link Toast -->
+{#if showInviteLinkToast}
+	<div
+		class="fixed right-4 bottom-4 z-40 w-128 rounded-sm border border-yellow-500/30 bg-yellow-900/20 p-4 text-yellow-400"
+	>
+		{t('event.inviteLinkCopied')}
+	</div>
+{/if}
