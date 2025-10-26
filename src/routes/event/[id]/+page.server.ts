@@ -1,9 +1,8 @@
 import { database } from '$lib/database/db';
-import { events, rsvps, inviteTokens } from '$lib/database/schema';
-import { eq, asc, and } from 'drizzle-orm';
+import { events, rsvps } from '$lib/database/schema';
+import { eq, asc } from 'drizzle-orm';
 import { error, fail } from '@sveltejs/kit';
 import type { PageServerLoad, Actions } from './$types';
-import { isTokenValid } from '$lib/inviteTokenHelpers.js';
 
 export const load: PageServerLoad = async ({ params, cookies }) => {
 	const eventId = params.id;

@@ -3,11 +3,11 @@
 -- Description: Adds invite-only visibility option and invite tokens table
 
 -- Add 'invite-only' to the visibility enum
-ALTER TABLE events 
+ALTER TABLE events
 DROP CONSTRAINT IF EXISTS events_visibility_check;
 
-ALTER TABLE events 
-ADD CONSTRAINT events_visibility_check 
+ALTER TABLE events
+ADD CONSTRAINT events_visibility_check
 CHECK (visibility IN ('public', 'private', 'invite-only'));
 
 -- Create invite_tokens table

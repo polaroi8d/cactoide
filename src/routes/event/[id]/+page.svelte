@@ -18,7 +18,7 @@
 	let newAttendeeName = '';
 	let isAddingRSVP = false;
 	let error = '';
-	let success = '';
+	let success = ''; // TODO: change to boolean and refactor with 482-506
 	let addGuests = false;
 	let numberOfGuests = 1;
 	let showCalendarModal = false;
@@ -50,19 +50,20 @@
 		success = '';
 	}
 
-	// TODO: ERROR
-	// //WHEN DELETING RSVP: THE MODAL MESSAGE IS "RSVP removed successfully."
+	const handleFormSuccess = () => {
+		if (form?.type === 'add') {
+			success = 'RSVP added successfully!';
+		} else {
+			success = 'RSVP removed successfully.';
+		}
 
-	// Handle form success from server
-	$: if (form?.success) {
-		success = 'RSVP added successfully!';
 		error = '';
 		newAttendeeName = '';
 		addGuests = false;
 		numberOfGuests = 1;
 
-		// show and auto-hide success toast for add action
-		toastType = 'add';
+		toastType = form?.type || 'add';
+
 		if (browser) {
 			if (successHideTimer) clearTimeout(successHideTimer);
 			successHideTimer = window.setTimeout(() => {
@@ -70,7 +71,10 @@
 				toastType = null;
 			}, 3000);
 		}
-	}
+	};
+
+	// Handle form success from server
+	$: if (form?.success) handleFormSuccess();
 
 	// Derive toast type from local or server form
 	$: typeToShow = toastType ?? form?.type;
