@@ -62,6 +62,8 @@ jobs:
           file: ./Dockerfile
           build-args: |
             PUBLIC_LANDING_INFO=${{ vars.PUBLIC_LANDING_INFO }}
+            LOG_PRETTY=${{ vars.LOG_PRETTY }}
+            LOG_LEVEL=${{ vars.LOG_LEVEL }}
           push: true
           platforms: linux/amd64,linux/arm64
           cache-from: type=gha
