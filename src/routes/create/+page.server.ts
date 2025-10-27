@@ -3,6 +3,7 @@ import { events, inviteTokens } from '$lib/database/schema';
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions } from './$types';
 import { generateInviteToken, calculateTokenExpiration } from '$lib/inviteTokenHelpers.js';
+import { logger } from '$lib/logger';
 
 // Generate a random URL-friendly ID
 function generateEventId(): string {
@@ -116,7 +117,7 @@ export const actions: Actions = {
 				userId: userId!
 			})
 			.catch((error) => {
-				console.error('Unexpected error', error);
+				logger.error({ error, eventId, userId }, 'Unexpected error creating event');
 				throw error;
 			});
 

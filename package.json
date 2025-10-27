@@ -22,7 +22,8 @@
 		"@tailwindcss/forms": "^0.5.9",
 		"@tailwindcss/typography": "^0.5.15",
 		"@tailwindcss/vite": "^4.0.0",
-		"drizzle-kit": "^0.31.5",
+		"@types/node": "^24.9.1",
+		"drizzle-kit": "^0.31.4",
 		"eslint": "^9.18.0",
 		"eslint-config-prettier": "^10.0.1",
 		"eslint-plugin-svelte": "^3.0.0",
@@ -41,6 +42,8 @@
 		"@sveltejs/adapter-node": "^5.3.1",
 		"drizzle-orm": "^0.44.5",
 		"fuse.js": "^7.1.0",
+		"pino": "^10.1.0",
+		"pino-pretty": "^13.1.2",
 		"postgres": "^3.4.7"
 	}
 }

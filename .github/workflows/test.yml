@@ -30,6 +30,8 @@ jobs:
         run: npm run build
         env:
           PUBLIC_LANDING_INFO: ${{ vars.PUBLIC_LANDING_INFO }}
+          LOG_PRETTY: ${{ vars.LOG_PRETTY }}
+          LOG_LEVEL: ${{ vars.LOG_LEVEL }}
 
       - name: Test build output
         run: |

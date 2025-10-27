@@ -3,6 +3,7 @@ import { events, rsvps } from '$lib/database/schema';
 import { eq, asc } from 'drizzle-orm';
 import { error, fail } from '@sveltejs/kit';
 import type { PageServerLoad, Actions } from './$types';
+import { logger } from '$lib/logger';
 
 export const load: PageServerLoad = async ({ params, cookies }) => {
 	const eventId = params.id;
@@ -70,7 +71,7 @@ export const load: PageServerLoad = async ({ params, cookies }) => {
 	} catch (err) {
 		if (err instanceof Response) throw err; // This is the 404 error
 
-		console.error('Error loading event:', err);
+		logger.error({ error: err, eventId }, 'Error loading event');
 		throw error(500, 'Failed to load event');
 	}
 };
@@ -145,7 +146,7 @@ export const actions: Actions = {
 
 			return { success: true, type: 'add' };
 		} catch (err) {
-			console.error('Error adding RSVP:', err);
+			logger.error({ error: err, eventId, userId, name }, 'Error adding RSVP');
 			return fail(500, { error: 'Failed to add RSVP' });
 		}
 	},
@@ -163,7 +164,7 @@ export const actions: Actions = {
 			await database.delete(rsvps).where(eq(rsvps.id, rsvpId));
 			return { success: true, type: 'remove' };
 		} catch (err) {
-			console.error('Error removing RSVP:', err);
+			logger.error({ error: err, rsvpId }, 'Error removing RSVP');
 			return fail(500, { error: 'Failed to remove RSVP' });
 		}
 	}

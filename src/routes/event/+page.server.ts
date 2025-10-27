@@ -3,6 +3,7 @@ import { events } from '$lib/database/schema';
 import { fail } from '@sveltejs/kit';
 import { eq, desc } from 'drizzle-orm';
 import type { Actions } from './$types';
+import { logger } from '$lib/logger';
 
 export const load = async ({ cookies }) => {
 	const userId = cookies.get('cactoideUserId');
@@ -36,7 +37,7 @@ export const load = async ({ cookies }) => {
 
 		return { events: transformedEvents };
 	} catch (error) {
-		console.error('Error loading user events:', error);
+		logger.error({ error, userId }, 'Error loading user events');
 		return { events: [] };
 	}
 };
@@ -68,7 +69,7 @@ export const actions: Actions = {
 
 			return { success: true };
 		} catch (error) {
-			console.error('Error deleting event:', error);
+			logger.error({ error, eventId, userId }, 'Error deleting event');
 			return fail(500, { error: 'Failed to delete event' });
 		}
 	}

@@ -2,6 +2,7 @@ import { database } from '$lib/database/db';
 import { desc, inArray } from 'drizzle-orm';
 import type { PageServerLoad } from './$types';
 import { events } from '$lib/database/schema';
+import { logger } from '$lib/logger';
 
 export const load: PageServerLoad = async () => {
 	try {
@@ -33,7 +34,7 @@ export const load: PageServerLoad = async () => {
 			events: transformedEvents
 		};
 	} catch (error) {
-		console.error('Error loading public events:', error);
+		logger.error({ error }, 'Error loading public events');
 
 		// Return empty array on error to prevent page crash
 		return {
