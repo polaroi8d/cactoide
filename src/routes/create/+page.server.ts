@@ -2,11 +2,8 @@ import { database } from '$lib/database/db';
 import { events, inviteTokens } from '$lib/database/schema';
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions } from './$types';
-<<<<<<< HEAD
 import { generateInviteToken, calculateTokenExpiration } from '$lib/inviteTokenHelpers.js';
-=======
 import { logger } from '$lib/logger';
->>>>>>> 222c2ee (feat: add pino logger for serverside)
 
 // Generate a random URL-friendly ID
 function generateEventId(): string {
