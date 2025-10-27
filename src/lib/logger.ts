@@ -14,16 +14,9 @@ const transport = USE_PRETTY_LOGS
 		}
 	: undefined;
 
-// Create the logger instance
 export const logger = pino({
 	level: LOG_LEVEL,
 	transport
 });
 
-// Export a helper to create child loggers with context
-export function createChildLogger(bindings: Record<string, unknown>) {
-	return logger.child(bindings);
-}
-
-// Export types
 export type Logger = typeof logger;
