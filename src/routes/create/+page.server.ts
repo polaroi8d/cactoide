@@ -1,7 +1,8 @@
 import { database } from '$lib/database/db';
-import { events } from '$lib/database/schema';
+import { events, inviteTokens } from '$lib/database/schema';
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions } from './$types';
+import { generateInviteToken, calculateTokenExpiration } from '$lib/inviteTokenHelpers.js';
 
 // Generate a random URL-friendly ID
 function generateEventId(): string {
@@ -25,7 +26,7 @@ export const actions: Actions = {
 		const locationUrl = formData.get('location_url') as string;
 		const type = formData.get('type') as 'limited' | 'unlimited';
 		const attendeeLimit = formData.get('attendee_limit') as string;
-		const visibility = formData.get('visibility') as 'public' | 'private';
+		const visibility = formData.get('visibility') as 'public' | 'private' | 'invite-only';
 		const userId = cookies.get('cactoideUserId');
 
 		// Validation
@@ -98,6 +99,7 @@ export const actions: Actions = {
 
 		const eventId = generateEventId();
 
+		// Create the event
 		await database
 			.insert(events)
 			.values({
@@ -117,6 +119,24 @@ export const actions: Actions = {
 				console.error('Unexpected error', error);
 				throw error;
 			});
+
+		// Generate invite token for invite-only events
+		if (visibility === 'invite-only') {
+			const token = generateInviteToken();
+			const expiresAt = calculateTokenExpiration(date, time);
+
+			await database
+				.insert(inviteTokens)
+				.values({
+					eventId: eventId,
+					token: token,
+					expiresAt: new Date(expiresAt)
+				})
+				.catch((error) => {
+					console.error('Error creating invite token', error);
+					throw error;
+				});
+		}
 
 		throw redirect(303, `/event/${eventId}`);
 	}

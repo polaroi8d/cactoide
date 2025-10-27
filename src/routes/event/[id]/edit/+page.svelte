@@ -21,6 +21,10 @@
 
 	let errors: Record<string, string> = {};
 	let isSubmitting = false;
+	let inviteToken = data.inviteToken;
+
+	let showInviteLinkToast = false;
+	let toastHideTimer: number | null = null;
 
 	// Get today's date in YYYY-MM-DD format for min attribute
 	const today = new Date().toISOString().split('T')[0];
@@ -66,6 +70,24 @@
 
 	const handleCancel = () => {
 		goto(`/event/${data.event.id}`);
+	};
+
+	const copyInviteLink = async () => {
+		if (inviteToken) {
+			const inviteUrl = `${window.location.origin}/event/${data.event.id}/invite/${inviteToken.token}`;
+			try {
+				await navigator.clipboard.writeText(inviteUrl);
+				showInviteLinkToast = true;
+
+				// Auto-hide toast after 3 seconds
+				if (toastHideTimer) clearTimeout(toastHideTimer);
+				toastHideTimer = window.setTimeout(() => {
+					showInviteLinkToast = false;
+				}, 3000);
+			} catch (err) {
+				console.error('Failed to copy invite link:', err);
+			}
+		}
 	};
 </script>
 
@@ -315,7 +337,7 @@
 							<legend class="text-dark-800 mb-3 block text-sm font-semibold">
 								{t('common.visibility')} <span class="text-red-400">{t('common.required')}</span>
 							</legend>
-							<div class="grid grid-cols-2 gap-3">
+							<div class="grid grid-cols-3 gap-3">
 								<button
 									type="button"
 									class="rounded-sm border-2 px-4 py-3 font-medium transition-all duration-200 {eventData.visibility ===
@@ -336,14 +358,58 @@
 								>
 									{t('create.privateOption')}
 								</button>
+								<button
+									type="button"
+									class="rounded-sm border-2 px-4 py-3 font-medium transition-all duration-200 {eventData.visibility ===
+									'invite-only'
+										? ' border-amber-500 bg-amber-400/20 font-semibold hover:bg-amber-400/70'
+										: 'border-dark-300 text-dark-700 bg-gray-600/20 hover:bg-gray-600/70'}"
+									on:click={() => (eventData.visibility = 'invite-only')}
+								>
+									{t('create.inviteOnlyOption')}
+								</button>
 							</div>
 							<p class="mt-2 text-xs text-slate-400">
 								{eventData.visibility === 'public'
 									? t('create.publicDescription')
-									: t('create.privateDescription')}
+									: eventData.visibility === 'private'
+										? t('create.privateDescription')
+										: t('create.inviteOnlyDescription')}
 							</p>
 						</fieldset>
 					</div>
+
+					<!-- Invite Link Section (only for invite-only events and event creator) -->
+					{#if eventData.visibility === 'invite-only' && inviteToken && data.event.userId === data.userId}
+						<div class="rounded-sm border border-amber-500/30 bg-amber-900/20 p-4">
+							<div class="mb-3 flex items-center justify-between">
+								<h3 class="text-lg font-semibold text-amber-400">Invite Link</h3>
+							</div>
+
+							<div class="space-y-3">
+								<div class="flex items-center space-x-2">
+									<input
+										type="text"
+										value={`${window.location.origin}/event/${data.event.id}/invite/${inviteToken.token}`}
+										readonly
+										class="flex-1 rounded-sm border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-900"
+									/>
+									<button
+										type="button"
+										on:click={copyInviteLink}
+										class="rounded-sm border border-amber-300 bg-amber-200 px-3 py-2 text-sm font-medium text-amber-900 hover:bg-amber-300"
+									>
+										{t('event.copyInviteLinkButton')}
+									</button>
+								</div>
+								<p class="text-xs text-amber-300">
+									{t('event.inviteLinkExpiresAt', {
+										time: new Date(inviteToken.expires_at).toLocaleString()
+									})}
+								</p>
+							</div>
+						</div>
+					{/if}
 
 					<!-- Action Buttons -->
 					<div class="flex space-x-3">
@@ -374,3 +440,12 @@
 		</div>
 	</div>
 </div>
+
+<!-- Invite Link Toast -->
+{#if showInviteLinkToast}
+	<div
+		class="fixed right-4 bottom-4 z-40 w-128 rounded-sm border border-yellow-500/30 bg-yellow-900/20 p-4 text-yellow-400"
+	>
+		{t('event.inviteLinkCopied')}
+	</div>
+{/if}

@@ -15,7 +15,7 @@
 		location_url: '',
 		type: 'unlimited',
 		attendee_limit: undefined,
-		visibility: 'public'
+		visibility: 'public' as 'public' | 'private' | 'invite-only'
 	};
 
 	let errors: Record<string, string> = {};
@@ -317,13 +317,13 @@
 								{t('create.visibilityLabel')}
 								<span class="text-red-400">{t('common.required')}</span>
 							</legend>
-							<div class="grid grid-cols-2 gap-3">
+							<div class="grid grid-cols-3 gap-3">
 								<button
 									type="button"
 									class="rounded-sm border-2 px-4 py-3 font-medium transition-all duration-200 {eventData.visibility ===
 									'public'
 										? ' border-violet-500 bg-violet-400/20 font-semibold hover:bg-violet-400/70'
-										: 'border-dark-300 text-dark-700'}"
+										: 'border-dark-300 text-dark-700 bg-gray-600/20 hover:bg-gray-600/70'}"
 									on:click={() => (eventData.visibility = 'public')}
 								>
 									{t('create.publicOption')}
@@ -338,11 +338,23 @@
 								>
 									{t('create.privateOption')}
 								</button>
+								<button
+									type="button"
+									class="rounded-sm border-2 px-4 py-3 font-medium transition-all duration-200 {eventData.visibility ===
+									'invite-only'
+										? ' border-violet-500 bg-violet-400/20 font-semibold hover:bg-violet-400/70'
+										: 'border-dark-300 text-dark-700 bg-gray-600/20 hover:bg-gray-600/70'}"
+									on:click={() => (eventData.visibility = 'invite-only')}
+								>
+									{t('create.inviteOnlyOption')}
+								</button>
 							</div>
 							<p class="mt-2 text-xs text-slate-400 italic">
 								{eventData.visibility === 'public'
 									? t('create.publicDescription')
-									: t('create.privateDescription')}
+									: eventData.visibility === 'private'
+										? t('create.privateDescription')
+										: 'Event is public but requires a special invite link to attend'}
 							</p>
 						</fieldset>
 					</div>

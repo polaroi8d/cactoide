@@ -1,5 +1,5 @@
 export type EventType = 'limited' | 'unlimited';
-export type EventVisibility = 'public' | 'private';
+export type EventVisibility = 'public' | 'private' | 'invite-only';
 export type ActionType = 'add' | 'remove';
 export type LocationType = 'none' | 'text' | 'maps';
 
@@ -60,5 +60,13 @@ export interface DatabaseRSVP {
 	event_id: string;
 	name: string;
 	user_id: string;
+	created_at: string;
+}
+
+export interface InviteToken {
+	id: string;
+	event_id: string;
+	token: string;
+	expires_at: string;
 	created_at: string;
 }
