@@ -3,6 +3,7 @@ import { events, inviteTokens } from '$lib/database/schema';
 import { eq, and } from 'drizzle-orm';
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
+import { logger } from '$lib/logger';
 
 export const load: PageServerLoad = async ({ params, cookies }) => {
 	const eventId = params.id;
@@ -165,7 +166,7 @@ export const actions: Actions = {
 			})
 			.where(and(eq(events.id, eventId), eq(events.userId, userId)))
 			.catch((error) => {
-				console.error('Unexpected error updating event', error);
+				logger.error({ error, eventId, userId }, 'Unexpected error updating event');
 				throw error;
 			});
 

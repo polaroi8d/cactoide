@@ -2,6 +2,7 @@
 import type { Handle } from '@sveltejs/kit';
 import { generateUserId } from '$lib/generateUserId.js';
 import { ensureDatabaseConnection } from '$lib/database/healthCheck';
+import { logger } from '$lib/logger';
 
 // Global flag to track if database health check has been performed
 let dbHealthCheckPerformed = false;
@@ -18,7 +19,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 			});
 			dbHealthCheckPerformed = true;
 		} catch (error) {
-			console.error('Database health check failed:', error);
+			logger.error({ error }, 'Database health check failed');
 			// The ensureDatabaseConnection function will exit the process
 			// if the database is unavailable, so this catch is just for safety
 			process.exit(1);
@@ -33,11 +34,10 @@ export const handle: Handle = async ({ event, resolve }) => {
 	const PATH = '/';
 
 	if (!cactoideUserId) {
-		console.debug(`There is no cactoideUserId cookie, generating new one...`);
+		logger.debug({ userId }, 'No cactoideUserId cookie found, generating new one');
 		event.cookies.set('cactoideUserId', userId, { path: PATH, maxAge: MAX_AGE });
 	} else {
-		console.debug(`cactoideUserId: ${cactoideUserId}`);
-		console.debug(`cactoideUserId cookie found, using existing one...`);
+		logger.debug({ cactoideUserId }, 'cactoideUserId cookie found, using existing one');
 	}
 
 	return resolve(event);

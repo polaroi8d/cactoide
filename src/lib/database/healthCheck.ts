@@ -1,5 +1,6 @@
 import postgres from 'postgres';
 import { env } from '$env/dynamic/private';
+import { logger } from '$lib/logger';
 
 interface HealthCheckOptions {
 	maxRetries?: number;
@@ -29,7 +30,7 @@ export async function checkDatabaseHealth(
 	} = options;
 
 	if (!env.DATABASE_URL) {
-		console.error('DATABASE_URL environment variable is not set');
+		logger.error('DATABASE_URL environment variable is not set');
 		return {
 			success: false,
 			error: 'DATABASE_URL environment variable is not set',
@@ -39,10 +40,10 @@ export async function checkDatabaseHealth(
 
 	let lastError: Error | null = null;
 
-	console.log(`Starting database health check (max retries: ${maxRetries})`);
+	logger.info({ maxRetries }, 'Starting database health check');
 
 	for (let attempt = 1; attempt <= maxRetries; attempt++) {
-		console.log(`Attempt ${attempt}/${maxRetries} - Testing database connection`);
+		logger.debug({ attempt, maxRetries }, 'Testing database connection');
 
 		try {
 			// Create a new connection for the health check
@@ -57,7 +58,7 @@ export async function checkDatabaseHealth(
 			await client`SELECT 1 as health_check`;
 			await client.end();
 
-			console.log(`Database connection successful on attempt ${attempt}.`);
+			logger.info({ attempt }, 'Database connection successful');
 
 			return {
 				success: true,
@@ -66,12 +67,12 @@ export async function checkDatabaseHealth(
 		} catch (error) {
 			lastError = error as Error;
 			const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-			console.error(`Connection failed on attempt ${attempt}: ${errorMessage}`);
+			logger.warn({ attempt, error: errorMessage }, 'Database connection failed');
 
 			// Don't wait after the last attempt
 			if (attempt < maxRetries) {
 				const delay = Math.min(baseDelay * Math.pow(2, attempt - 1), maxDelay);
-				console.log(`Waiting ${delay}ms before retry...`);
+				logger.debug({ delay }, 'Waiting before retry');
 				await new Promise((resolve) => setTimeout(resolve, delay));
 			}
 		}
@@ -79,7 +80,10 @@ export async function checkDatabaseHealth(
 
 	const finalError = lastError?.message || 'Unknown database connection error';
 
-	console.error(`All ${maxRetries} attempts failed. Final error: ${finalError}`);
+	logger.error(
+		{ attempts: maxRetries, error: finalError },
+		'All database connection attempts failed'
+	);
 
 	return {
 		success: false,
@@ -95,10 +99,10 @@ export async function ensureDatabaseConnection(options?: HealthCheckOptions): Pr
 	const result = await checkDatabaseHealth(options);
 
 	if (!result.success) {
-		console.error('Database connection failed after all retry attempts');
-		console.error(`Error: ${result.error}`);
-		console.error(`Attempts made: ${result.attempts}`);
-		console.error('Exiting application...');
+		logger.fatal(
+			{ error: result.error, attempts: result.attempts },
+			'Database connection failed after all retry attempts. Exiting application'
+		);
 		process.exit(1);
 	}
 }
