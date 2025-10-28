@@ -485,19 +485,19 @@
 {#if success}
 	{#if typeToShow === 'add'}
 		<div
-			class="fixed right-4 bottom-4 z-40 w-128 rounded-sm border border-green-500/30 bg-green-900/20 p-4 text-green-400"
+			class="fixed right-4 bottom-4 z-40 w-128 rounded-sm border border-green-500/30 bg-green-900 p-4 text-green-400"
 		>
 			{success}
 		</div>
 	{:else if typeToShow === 'remove'}
 		<div
-			class="fixed right-4 bottom-4 z-40 w-128 rounded-sm border border-yellow-500/30 bg-yellow-900/20 p-4 text-yellow-400"
+			class="fixed right-4 bottom-4 z-40 w-128 rounded-sm border border-yellow-500/30 bg-yellow-900 p-4 text-yellow-400"
 		>
 			{t('event.removedRsvpSuccessfully')}
 		</div>
 	{:else if typeToShow === 'copy'}
 		<div
-			class="fixed right-4 bottom-4 z-40 w-128 rounded-sm border border-yellow-500/30 bg-yellow-900/20 p-4 text-yellow-400"
+			class="fixed right-4 bottom-4 z-40 w-128 rounded-sm border border-yellow-500/30 bg-yellow-900 p-4 text-yellow-400"
 		>
 			{t('event.eventLinkCopied')}
 		</div>
@@ -508,7 +508,7 @@
 
 {#if error}
 	<div
-		class="fixed right-4 bottom-4 z-40 w-128 rounded-sm border border-red-500/30 bg-red-900/20 p-4 text-red-400"
+		class="fixed right-4 bottom-4 z-40 w-128 rounded-sm border border-red-500/30 bg-red-900 p-4 text-red-400"
 	>
 		{error}
 	</div>

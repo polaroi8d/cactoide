@@ -444,7 +444,7 @@
 <!-- Invite Link Toast -->
 {#if showInviteLinkToast}
 	<div
-		class="fixed right-4 bottom-4 z-40 w-128 rounded-sm border border-yellow-500/30 bg-yellow-900/20 p-4 text-yellow-400"
+		class="fixed right-4 bottom-4 z-40 w-128 rounded-sm border border-yellow-500/30 bg-yellow-900 p-4 text-yellow-400"
 	>
 		{t('event.inviteLinkCopied')}
 	</div>

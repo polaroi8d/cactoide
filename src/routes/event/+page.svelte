@@ -156,7 +156,8 @@
 												? 'border-green-300 text-green-400'
 												: 'border-orange-300 text-orange-400'}"
 										>
-											{event.visibility === 'public' ? t('common.public') : t('common.private')}
+											<!-- TODO(polaroi8d): replace with something better solution; message.json using this, beacuse of common.invite-only works here -->
+											{t(`common.${event.visibility}`)}
 										</span>
 									</div>
 									<div class="flex items-center space-x-2"></div>

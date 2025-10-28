@@ -14,7 +14,7 @@
 	<!-- Error Content -->
 	<div class="container mx-auto flex-1 px-4 py-8">
 		<div class="mx-auto max-w-md text-center">
-			<div class="rounded-sm border border-red-500/30 bg-red-900/20 p-8">
+			<div class="rounded-sm border border-red-500/30 bg-red-900 p-8">
 				<div class="mb-4 text-6xl text-red-400">🚨</div>
 				<h2 class="mb-4 text-2xl font-bold text-red-400">{t('errors.errorTitle')}</h2>
 

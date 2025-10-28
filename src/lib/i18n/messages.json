@@ -28,6 +28,7 @@
 		"public": "Public",
 		"private": "Private",
 		"inviteOnly": "Invite Only",
+		"invite-only": "Invite Only",
 		"limited": "Limited",
 		"unlimited": "Unlimited",
 		"capacity": "Capacity",
@@ -267,7 +268,7 @@
 	"layout": {
 		"defaultTitle": "Cactoide -",
 		"defaultDescription": "Create and manage event RSVPs",
-		"userIdCookieText": "Your UserID storated as a cookie:",
+		"userIdCookieText": "Your UserID stored as a cookie:",
 		"firstTimeVisiting": "First time visiting. Generating new UserID...",
 		"copyright": "© 2025 Cactoide"
 	}
