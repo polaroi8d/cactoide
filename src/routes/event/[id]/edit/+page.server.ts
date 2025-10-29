@@ -76,7 +76,7 @@ export const actions: Actions = {
 		const date = formData.get('date') as string;
 		const time = formData.get('time') as string;
 		const location = formData.get('location') as string;
-		const locationType = formData.get('location_type') as 'none' | 'text' | 'maps';
+		const locationType = formData.get('locationType') as string;
 		const locationUrl = formData.get('location_url') as string;
 		const type = formData.get('type') as 'limited' | 'unlimited';
 		const attendeeLimit = formData.get('attendee_limit') as string;
@@ -109,7 +109,7 @@ export const actions: Actions = {
 			});
 		}
 
-		// Check if date is in the past using local timezone (but allow editing past events for corrections)
+		// Check if date is in the past using local timezone
 		const [year, month, day] = date.split('-').map(Number);
 		const eventDate = new Date(year, month - 1, day);
 		const today = new Date();
@@ -148,7 +148,6 @@ export const actions: Actions = {
 				}
 			});
 		}
-
 		// Update the event
 		await database
 			.update(events)
@@ -157,7 +156,7 @@ export const actions: Actions = {
 				date: date,
 				time: time,
 				location: location?.trim() || '',
-				locationType: locationType,
+				locationType: locationType as 'none' | 'text' | 'maps',
 				locationUrl: locationType === 'maps' ? locationUrl?.trim() : null,
 				type: type,
 				attendeeLimit: type === 'limited' ? parseInt(attendeeLimit) : null,

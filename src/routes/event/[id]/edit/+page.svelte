@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { EventType, LocationType } from '$lib/types';
+	import type { CreateEventData, EventType, LocationType } from '$lib/types';
 	import { enhance } from '$app/forms';
 	import { goto } from '$app/navigation';
 	import { t } from '$lib/i18n/i18n.js';
@@ -7,7 +7,7 @@
 	export let data;
 	export let form;
 
-	let eventData = {
+	let eventData: CreateEventData = {
 		name: data.event.name,
 		date: data.event.date,
 		time: data.event.time,
@@ -15,7 +15,7 @@
 		location_type: data.event.locationType || 'none',
 		location_url: data.event.locationUrl || '',
 		type: data.event.type,
-		attendee_limit: data.event.attendeeLimit,
+		attendee_limit: data.event.attendeeLimit || undefined,
 		visibility: data.event.visibility
 	};
 
@@ -44,14 +44,14 @@
 			attendee_limit: (values as any).attendee_limit
 				? // eslint-disable-next-line @typescript-eslint/no-explicit-any
 					parseInt(String((values as any).attendee_limit))
-				: null
+				: undefined
 		};
 	}
 
 	const handleTypeChange = (type: EventType) => {
 		eventData.type = type;
 		if (type === 'unlimited') {
-			eventData.attendee_limit = null;
+			eventData.attendee_limit = undefined;
 		}
 	};
 
@@ -189,6 +189,9 @@
 
 					<!-- Location Type -->
 					<div>
+						<!-- Hidden input to submit locationType value -->
+						<input type="hidden" name="locationType" bind:value={eventData.location_type} />
+
 						<fieldset>
 							<legend class="text-dark-800 mb-3 block text-sm font-semibold">
 								{t('create.locationTypeLabel')}
@@ -279,6 +282,9 @@
 
 					<!-- Event Type -->
 					<div>
+						<!-- Hidden input to submit type value -->
+						<input type="hidden" name="type" bind:value={eventData.type} />
+
 						<fieldset>
 							<legend class="text-dark-800 mb-3 block text-sm font-semibold">
 								{t('common.type')} <span class="text-red-400">{t('common.required')}</span>
@@ -333,6 +339,9 @@
 
 					<!-- Event Visibility -->
 					<div>
+						<!-- Hidden input to submit visibility value -->
+						<input type="hidden" name="visibility" bind:value={eventData.visibility} />
+
 						<fieldset>
 							<legend class="text-dark-800 mb-3 block text-sm font-semibold">
 								{t('common.visibility')} <span class="text-red-400">{t('common.required')}</span>
