@@ -129,14 +129,15 @@ export const actions: Actions = {
 			// Get current RSVPs
 			const currentRSVPs = await database.select().from(rsvps).where(eq(rsvps.eventId, eventId));
 
-			// Calculate total attendees (including guests)
-			const totalAttendees = currentRSVPs.length + numberOfGuests;
+			// Calculate remaining spots and ensure main attendee + guests fit
+			const newAttendeesCount = 1 + numberOfGuests;
+			const remainingSpots = (eventData.attendeeLimit ?? 0) - currentRSVPs.length;
 
 			// Check if event is full (for limited type events)
 			if (eventData.type === 'limited' && eventData.attendeeLimit) {
-				if (totalAttendees > eventData.attendeeLimit) {
+				if (newAttendeesCount > remainingSpots) {
 					return fail(400, {
-						error: `Event capacity exceeded. You're trying to add ${numberOfGuests + 1} attendees (including yourself), but only ${eventData.attendeeLimit - currentRSVPs.length} spots remain.`
+						error: `Event capacity exceeded. You're trying to add ${newAttendeesCount} attendee${newAttendeesCount === 1 ? '' : 's'} (including yourself), but only ${remainingSpots} spot${remainingSpots === 1 ? '' : 's'} remain.`
 					});
 				}
 			}
