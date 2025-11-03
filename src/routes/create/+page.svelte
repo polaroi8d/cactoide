@@ -139,6 +139,11 @@
 								bind:value={eventData.date}
 								min={today}
 								class="border-dark-300 w-full rounded-sm border-2 bg-white px-4 py-3 text-slate-900 shadow-sm transition-all duration-200"
+								on:keydown={(e) => {
+									if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+										e.preventDefault();
+									}
+								}}
 								required
 							/>
 							{#if errors.date}
