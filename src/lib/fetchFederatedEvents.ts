@@ -69,9 +69,9 @@ async function readFederationConfig(): Promise<FederationConfig | null> {
  */
 async function fetchEventsFromInstance(instanceUrl: string): Promise<Event[]> {
 	try {
-		// Ensure URL has protocol and append /api/events
+		// Ensure URL has protocol and append /api/federation/events
 
-		const apiUrl = `http://${instanceUrl}/api/events`;
+		const apiUrl = `http://${instanceUrl}/api/federation/events`;
 
 		logger.debug({ apiUrl }, 'Fetching events from federated instance');
 
