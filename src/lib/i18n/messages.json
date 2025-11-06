@@ -99,7 +99,8 @@
 		"home": "Home",
 		"discover": "Discover",
 		"create": "Create",
-		"myEvents": "My Events"
+		"myEvents": "My Events",
+		"instance": "Instance"
 	},
 	"home": {
 		"title": "Cactoide - The RSVP site",

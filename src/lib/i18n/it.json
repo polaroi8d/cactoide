@@ -94,7 +94,8 @@
 		"home": "Home",
 		"discover": "Scopri",
 		"create": "Crea",
-		"myEvents": "I Miei Eventi"
+		"myEvents": "I Miei Eventi",
+		"instance": "Istanza"
 	},
 	"home": {
 		"title": "Cactoide - Il sito per gli RSVP",

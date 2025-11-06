@@ -9,6 +9,9 @@ const config = {
 		},
 		{
 			url: 'localhost:5174'
+		},
+		{
+			url: 'localhost:5175'
 		}
 	]
 };
