@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { t } from '$lib/i18n/i18n.js';
-
 	interface InstanceData {
 		url: string;
 		name: string | null;
@@ -62,7 +60,7 @@
 				</tr>
 			</thead>
 			<tbody class="divide-y divide-slate-700">
-				{#each data.instances as instance}
+				{#each data.instances as instance, i (i)}
 					<tr class="hover:bg-slate-700/50">
 						<td class="px-6 py-4 whitespace-nowrap">
 							<span class="text-sm font-medium text-slate-300">
