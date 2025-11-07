@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { t } from '$lib/i18n/i18n.js';
+
 	interface InstanceData {
 		url: string;
 		name: string | null;
@@ -22,8 +24,19 @@
 	}
 
 	function formatResponseTime(responseTime: number | null): string {
-		if (responseTime === null) return 'N/A';
+		if (responseTime === null) return t('instance.notAvailable');
 		return `${responseTime} ms`;
+	}
+
+	function getHealthStatusText(status: 'healthy' | 'unhealthy' | 'unknown'): string {
+		switch (status) {
+			case 'healthy':
+				return t('instance.healthStatusHealthy');
+			case 'unhealthy':
+				return t('instance.healthStatusUnhealthy');
+			case 'unknown':
+				return t('instance.healthStatusUnknown');
+		}
 	}
 </script>
 
@@ -35,27 +48,27 @@
 					<th
 						class="px-6 py-3 text-left text-xs font-medium tracking-wider text-slate-400 uppercase"
 					>
-						Name
+						{t('instance.name')}
 					</th>
 					<th
 						class="px-6 py-3 text-left text-xs font-medium tracking-wider text-slate-400 uppercase"
 					>
-						URL
+						{t('instance.url')}
 					</th>
 					<th
 						class="px-6 py-3 text-left text-xs font-medium tracking-wider text-slate-400 uppercase"
 					>
-						Events
+						{t('instance.events')}
 					</th>
 					<th
 						class="px-6 py-3 text-left text-xs font-medium tracking-wider text-slate-400 uppercase"
 					>
-						Health Status
+						{t('instance.healthStatus')}
 					</th>
 					<th
 						class="px-6 py-3 text-left text-xs font-medium tracking-wider text-slate-400 uppercase"
 					>
-						Response Time
+						{t('instance.responseTime')}
 					</th>
 				</tr>
 			</thead>
@@ -64,7 +77,7 @@
 					<tr class="hover:bg-slate-700/50">
 						<td class="px-6 py-4 whitespace-nowrap">
 							<span class="text-sm font-medium text-slate-300">
-								{instance.name || 'N/A'}
+								{instance.name || t('instance.notAvailable')}
 							</span>
 						</td>
 						<td class="px-6 py-4 whitespace-nowrap">
@@ -79,7 +92,7 @@
 						</td>
 						<td class="px-6 py-4 whitespace-nowrap">
 							<span class="text-sm text-slate-300">
-								{instance.events !== null ? instance.events : 'N/A'}
+								{instance.events !== null ? instance.events : t('instance.notAvailable')}
 							</span>
 						</td>
 						<td class="px-6 py-4 whitespace-nowrap">
@@ -88,10 +101,10 @@
 									class="mr-2 inline-block h-3 w-3 rounded-full {getStatusColor(
 										instance.responseTime
 									)}"
-									title={instance.healthStatus}
+									title={getHealthStatusText(instance.healthStatus)}
 								></span>
 								<span class="text-sm text-slate-300 capitalize">
-									{instance.healthStatus}
+									{getHealthStatusText(instance.healthStatus)}
 								</span>
 								{#if instance.error}
 									<span class="ml-2 text-xs text-slate-500">({instance.error})</span>
@@ -116,15 +129,16 @@
 		</table>
 
 		<p class="py-8 text-center text-slate-400">
-			These are the instances that are part of the github original federation list, if you want to
-			add your instance to the list, please open a pull request to the <a
+			{t('instance.description')}
+			<a
 				href="https://github.com/cactoide/cactoide/blob/main/federation.config.js"
-				class="text-violet-300/80">federation.config.js</a
-			> file.
+				class="text-violet-300/80">{t('instance.configFile')}</a
+			>
+			{t('instance.file')}
 		</p>
 
 		{#if data.instances.length === 0}
-			<div class="py-8 text-center text-slate-500">No federation instances configured.</div>
+			<div class="py-8 text-center text-slate-500">{t('instance.noInstances')}</div>
 		{/if}
 	</div>
 </div>
