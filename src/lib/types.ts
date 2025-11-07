@@ -17,6 +17,8 @@ export interface Event {
 	user_id: string;
 	created_at: string;
 	updated_at: string;
+	federation?: boolean; // Optional: true if event is from a federated instance
+	federation_url?: string; // Optional: URL of the federated instance this event came from
 }
 
 export interface RSVP {

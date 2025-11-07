@@ -267,9 +267,15 @@
 
 				<div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
 					{#each filteredEvents as event, i (i)}
-						<div class="rounded-sm border border-slate-200 p-6 shadow-sm">
-							<div class="mb-4">
-								<h3 class="mb-2 text-xl font-bold text-slate-300">{event.name}</h3>
+						{@const isFederated = event.federation === true}
+						<div
+							class="flex flex-col rounded-sm border border-slate-200 bg-slate-800/50
+								p-6 shadow-sm"
+						>
+							<div class="mb-4 flex-1">
+								<div class="mb-2 flex items-center justify-between">
+									<h3 class="text-xl font-bold text-slate-300">{event.name}</h3>
+								</div>
 								<div class="space-y-2 text-sm text-slate-500">
 									<div class="flex items-center space-x-2">
 										<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -314,36 +320,58 @@
 											<span>{event.location}</span>
 										{/if}
 									</div>
-									<div class="flex items-center space-x-2">
-										<span
-											class="rounded-sm border px-2 py-1 text-xs font-medium {event.type ===
-											'limited'
-												? 'border-amber-600 text-amber-600'
-												: 'border-teal-500 text-teal-500'}"
-										>
-											{event.type === 'limited' ? t('common.limited') : t('common.unlimited')}
-										</span>
-									</div>
-									<div class="flex items-center space-x-2">
-										<span
-											class="rounded-sm border px-2 py-1 text-xs font-medium {event.visibility ===
-											'public'
-												? 'border-teal-500 text-teal-500'
-												: 'border-amber-600 text-amber-600'}"
-										>
-											{event.visibility === 'public' ? t('common.public') : t('common.inviteOnly')}
-										</span>
-									</div>
+									{#if isFederated && event.federation_url}
+										<div class="flex items-center space-x-2">
+											<span
+												class="rounded-sm border border-blue-500 px-2 py-1 text-xs
+												font-medium text-blue-500"
+											>
+												{event.federation_url}
+											</span>
+										</div>{:else}
+										<div class="flex items-center space-x-2">
+											<span
+												class="rounded-sm border px-2 py-1 text-xs font-medium {event.type ===
+												'limited'
+													? 'border-amber-600 text-amber-600'
+													: 'border-teal-500 text-teal-500'}"
+											>
+												{event.type === 'limited' ? t('common.limited') : t('common.unlimited')}
+											</span>
+										</div>
+										<div class="flex items-center space-x-2">
+											<span
+												class="rounded-sm border px-2 py-1 text-xs font-medium {event.visibility ===
+												'public'
+													? 'border-teal-500 text-teal-500'
+													: 'border-amber-600 text-amber-600'}"
+											>
+												{event.visibility === 'public'
+													? t('common.public')
+													: t('common.inviteOnly')}
+											</span>
+										</div>{/if}
 								</div>
 							</div>
 
-							<div class="flex">
-								<button
-									on:click={() => goto(`/event/${event.id}`)}
-									class="flex-1 rounded-sm border-2 border-violet-500 bg-violet-400/20 px-4 py-2 font-semibold duration-200 hover:bg-violet-400/70"
-								>
-									{t('discover.viewButton')}
-								</button>
+							<div class="mt-auto flex">
+								{#if isFederated && event.federation_url}
+									<a
+										href="{event.federation_url}/event/{event.id}"
+										target="_blank"
+										rel="noopener noreferrer"
+										class="flex-1 rounded-sm border-2 border-blue-500 bg-blue-400/20 px-4 py-2 text-center font-semibold duration-200 hover:bg-blue-400/70"
+									>
+										View
+									</a>
+								{:else}
+									<button
+										on:click={() => goto(`/event/${event.id}`)}
+										class="flex-1 rounded-sm border-2 border-violet-500 bg-violet-400/20 px-4 py-2 font-semibold duration-200 hover:bg-violet-400/70"
+									>
+										{t('discover.viewButton')}
+									</button>
+								{/if}
 							</div>
 						</div>
 					{/each}

@@ -3,10 +3,11 @@ import { desc, inArray } from 'drizzle-orm';
 import type { PageServerLoad } from './$types';
 import { events } from '$lib/database/schema';
 import { logger } from '$lib/logger';
+import { fetchAllFederatedEvents } from '$lib/fetchFederatedEvents';
 
 export const load: PageServerLoad = async () => {
 	try {
-		// Fetch all non-private events (public and invite-only) ordered by creation date (newest first)
+		// Fetch all non-private events ordered by creation date (newest first)
 		const publicEvents = await database
 			.select()
 			.from(events)
@@ -17,24 +18,36 @@ export const load: PageServerLoad = async () => {
 		const transformedEvents = publicEvents.map((event) => ({
 			id: event.id,
 			name: event.name,
-			date: event.date, // Already in 'YYYY-MM-DD' format
-			time: event.time, // Already in 'HH:MM:SS' format
+			date: event.date,
+			time: event.time,
 			location: event.location,
 			location_type: event.locationType,
 			location_url: event.locationUrl,
 			type: event.type,
-			attendee_limit: event.attendeeLimit, // Note: schema uses camelCase
+			attendee_limit: event.attendeeLimit,
 			visibility: event.visibility,
-			user_id: event.userId, // Note: schema uses camelCase
+			user_id: event.userId,
 			created_at: event.createdAt?.toISOString(),
-			updated_at: event.updatedAt?.toISOString()
+			updated_at: event.updatedAt?.toISOString(),
+			federation: false // Add false for local events
 		}));
 
+		// Fetch federated events from federation.config.js
+		let federatedEvents: typeof transformedEvents = [];
+		try {
+			federatedEvents = await fetchAllFederatedEvents();
+		} catch (error) {
+			logger.error({ error }, 'Error fetching federated events, continuing with local events only');
+		}
+
+		// Merge local and federated events
+		const allEvents = [...transformedEvents, ...federatedEvents];
+
 		return {
-			events: transformedEvents
+			events: allEvents
 		};
 	} catch (error) {
-		logger.error({ error }, 'Error loading public events');
+		logger.error({ error }, 'Error loading events');
 
 		// Return empty array on error to prevent page crash
 		return {

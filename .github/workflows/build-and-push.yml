@@ -61,6 +61,7 @@ jobs:
           context: .
           file: ./Dockerfile
           build-args: |
+            FEDERATION_INSTANCE=${{ vars.FEDERATION_INSTANCE }}
             PUBLIC_LANDING_INFO=${{ vars.PUBLIC_LANDING_INFO }}
             LOG_PRETTY=${{ vars.LOG_PRETTY }}
             LOG_LEVEL=${{ vars.LOG_LEVEL }}

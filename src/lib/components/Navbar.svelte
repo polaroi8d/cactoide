@@ -49,6 +49,13 @@
 				</button>
 
 				<button
+					on:click={() => goto('/instance')}
+					class={isActive('/instance') ? 'text-violet-400' : 'cursor-pointer'}
+				>
+					{t('navigation.instance')}
+				</button>
+
+				<button
 					on:click={() => goto('/event')}
 					class={isActive('/event') ? 'text-violet-400' : 'cursor-pointer'}
 				>

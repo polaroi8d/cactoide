@@ -99,7 +99,8 @@
 		"home": "Home",
 		"discover": "Discover",
 		"create": "Create",
-		"myEvents": "My Events"
+		"myEvents": "My Events",
+		"instance": "Instance"
 	},
 	"home": {
 		"title": "Cactoide - The RSVP site",
@@ -249,6 +250,21 @@
 		"viewButton": "View",
 		"noEventsFoundTitle": "No events found",
 		"noEventsFoundDescription": "Try adjusting your search terms or browse all events"
+	},
+	"instance": {
+		"name": "Name",
+		"url": "URL",
+		"events": "Events",
+		"healthStatus": "Health Status",
+		"responseTime": "Response Time",
+		"notAvailable": "N/A",
+		"healthStatusHealthy": "healthy",
+		"healthStatusUnhealthy": "unhealthy",
+		"healthStatusUnknown": "unknown",
+		"description": "These are the instances that are part of the github original federation list, if you want to add your instance to the list, please open a pull request to the",
+		"configFile": "federation.config.js",
+		"file": "file.",
+		"noInstances": "No federation instances configured."
 	},
 	"calendar": {
 		"addToCalendarTitle": "Add to Calendar",

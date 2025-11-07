@@ -7,6 +7,9 @@ RUN npm ci
 ARG PUBLIC_LANDING_INFO
 ENV PUBLIC_LANDING_INFO=$PUBLIC_LANDING_INFO
 
+ARG FEDERATION_INSTANCE
+ENV FEDERATION_INSTANCE=$FEDERATION_INSTANCE
+
 ARG LOG_PRETTY
 ENV LOG_PRETTY=$LOG_PRETTY
 
@@ -29,7 +32,7 @@ ENV PORT 3000
 ENV HOSTNAME "0.0.0.0"
 
 HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://127.0.0.1:3000/healthz || exit 1
+  CMD wget --no-verbose --tries=1 --spider http://127.0.0.1:3000/api/healthz || exit 1
 
 EXPOSE 3000
 CMD [ "node", "build" ]
