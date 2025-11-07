@@ -14,7 +14,7 @@ Like the cactus, great events bloom under any condition when managed with care. 
 
 #### What is it?
 
-A mobile-first event RSVP platform that lets you create events, share unique URLs, and collect RSVPs without any registration required. With built-in federation, discover and share events across a decentralized network of instances.
+A federated mobile-first event RSVP platform that lets you create events, share unique URLs, and collect RSVPs without any registration required. With built-in federation, discover and share events across a decentralized network of instances.
 
 ### ✨ Features
 
@@ -71,21 +71,21 @@ Cactoide supports federation, allowing multiple instances to share and discover 
   <img alt="Federation Example" src="./docs/federation_example.png" width="840">
 </p>
 
-#### How Federation Works
+#### How it works
 
 Federation is managed through the `federation.config.js` file, which contains:
 
-- **Instance name**: The display name for your instance
-- **Instance list**: An array of federated instance URLs
+- **Instance name**: The display name for your instance when exposing events to the federation
+- **Instance list**: An array of federated instance URLs. Add instance URLs here to discover events from other federated instances.
 
 ```javascript
 const config = {
 	name: 'Cactoide Genesis',
-	instances: [{ url: 'cactoide.org' }, { url: 'cactoide.dalev.hu' }]
+	instances: [{ url: 'js-meetups.seattle.io' }, { url: 'ai-events.seattle.com' }]
 };
 ```
 
-#### Opting In to Federation
+#### Opt-in
 
 To enable federation on your instance, you need to:
 
@@ -93,24 +93,22 @@ To enable federation on your instance, you need to:
 
 2. **Configure your instance name**: Update the `name` field in your `federation.config.js` file to set your instance's display name.
 
-3. **Expose required endpoints**: Your instance will automatically expose:
-   - `/api/federation/events` - Returns all public events from your instance
-   - `/api/federation/info` - Returns your instance name and public events count
+Your instance will automatically expose:
 
-#### Adding Your Instance to the Global Federation
+- `/api/federation/events` - Returns all public events from your instance
+- `/api/federation/info` - Returns your instance name and public events count
+
+#### Adding your instance
 
 To add your instance to the global federation list (so other instances can discover your events):
 
 1. Fork the [Cactoide repository](https://github.com/polaroi8d/cactoide)
-2. Add your instance URL to the `instances` array in `federation.config.js`:
-   ```javascript
-   instances: [{ url: 'your-instance.com' }];
-   ```
+2. Add your instance URL to the `instances` array in [`federation.config.js`](https://github.com/polaroi8d/cactoide/blob/main/federation.config.js):
 3. Open a pull request to the main repository
 
 Once merged, your instance will appear in the federation network, and other instances will be able to discover and display your public events.
 
-You can view all registered federated instances in the main repository: `federation.config.js` file.
+You can view all registered federated instances in the main repository: [`federation.config.js`](https://github.com/polaroi8d/cactoide/blob/main/federation.config.js) file.
 
 ### Options
 
