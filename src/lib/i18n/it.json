@@ -73,7 +73,7 @@
 		"youMayNotHavePermission": "Potresti non avere il permesso di eliminare questo evento.",
 		"anErrorOccurredWhileDeleting": "Si è verificato un errore durante l'eliminazione dell'evento:",
 		"databaseUnreachable": "Database non raggiungibile.",
-		"eventIdNotFound": "EventId non trovato",
+		"eventIdNotFound": "Id evento non trovato",
 		"eventNotExists": "Evento non trovato",
 		"failedToLoadEvent": "Impossibile caricare l'evento",
 		"nameAndUserIdRequired": "Nome e ID utente sono obbligatori",
@@ -244,9 +244,9 @@
 	"calendar": {
 		"addToCalendarTitle": "Aggiungi al Calendario",
 		"googleCalendarTitle": "Google Calendar",
-		"googleCalendarDescription": "Aggiungi a Google Calendar",
+		"googleCalendarDescription": "Aggiungi al calendario di Google",
 		"microsoftOutlookTitle": "Microsoft Outlook",
-		"microsoftOutlookDescription": "Aggiungi a Outlook Calendar",
+		"microsoftOutlookDescription": "Aggiungi al calendario di Outlook",
 		"downloadICalTitle": "Scarica File iCal",
 		"downloadICalDescription": "Scarica file .ics per qualsiasi app di calendario"
 	},
