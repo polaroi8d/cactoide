@@ -1,0 +1,151 @@
+# Cactoide
+
+> A federated mobile-first event RSVP platform built with SvelteKit. Cactoide is an open-source alternative to big tech event platforms like Meetup.com, Eventbrite, and Luma. It allows users to create events, share unique URLs, and collect RSVPs without any registration required. Features include built-in federation for decentralized event discovery across multiple instances, iCal integration, smart capacity limits, and a no-signup approach. The platform uses PostgreSQL with Drizzle ORM, implements federation via configurable instance lists, and supports multiple languages through a simple i18n system.
+
+Cactoide is an open-source event management platform licensed under AGPL-3.0, designed as a privacy-focused alternative to centralized event platforms. Unlike Meetup.com, Eventbrite, Luma, and other big tech solutions, Cactoide requires no user accounts, collects minimal data, and operates on a federated model that gives users control over their events and data. Events can be public, private, or invite-only. The platform supports both limited and unlimited RSVP capacity.
+
+## Architecture
+
+The project is built with:
+- **Frontend**: SvelteKit 5 with TypeScript, Tailwind CSS
+- **Backend**: SvelteKit server routes and API endpoints
+- **Database**: PostgreSQL with Drizzle ORM
+- **Deployment**: Docker and Docker Compose support
+
+Key architectural decisions:
+- File-based routing (SvelteKit conventions)
+- Server-side rendering for all pages
+- Cookie-based user identification (no authentication system)
+- Federation via HTTP API endpoints between instances
+
+## API Endpoints
+
+- [Health Check](/api/healthz): Returns instance health status and response time in milliseconds
+- [Federation Events](/api/federation/events): Returns all public events from the instance (requires FEDERATION_INSTANCE env variable)
+- [Federation Info](/api/federation/info): Returns instance name and public events count (requires FEDERATION_INSTANCE env variable)
+
+## Database Schema
+
+The database uses three main tables:
+- **events**: Stores event information (id, name, date, time, location, type, visibility, attendee_limit, user_id)
+- **rsvps**: Stores RSVP responses (id, event_id, name, user_id, created_at)
+- **invite_tokens**: Stores invite tokens for invite-only events (id, event_id, token, expires_at)
+
+Event visibility can be: public, private, or invite-only. Event types can be: limited or unlimited.
+
+## Federation
+
+Federation allows multiple Cactoide instances to share and discover public events. Configuration is managed through `federation.config.js` which contains:
+- Instance name (display name for the instance)
+- Instance list (array of federated instance URLs to discover events from)
+
+To enable federation on an instance:
+1. Set `FEDERATION_INSTANCE=true` environment variable
+2. Configure instance name in `federation.config.js`
+3. Add other instance URLs to the instances array to discover their events
+
+Federated instances are displayed at `/instance` with health status, response times, and event counts.
+
+## Routes
+
+- `/` - Landing page (can be disabled with PUBLIC_LANDING_INFO=false)
+- `/create` - Event creation form
+- `/discover` - Public events discovery page with search and filters
+- `/event/[id]` - Individual event page with RSVP functionality
+- `/instance` - Federation instances status page
+
+## Code Structure
+
+### src/routes/
+SvelteKit file-based routing system. Each folder represents a route, with `+page.svelte` for UI and `+page.server.ts` for server-side data loading.
+
+- [src/routes/](https://github.com/polaroi8d/cactoide/tree/main/src/routes): Main routing directory
+  - `+layout.svelte` / `+layout.server.ts`: Root layout component and server-side data loading for all pages
+  - `+page.svelte` / `+page.server.ts`: Landing/home page
+  - `+error.svelte`: Global error page component
+  - [src/routes/create/](https://github.com/polaroi8d/cactoide/tree/main/src/routes/create): Event creation form page
+  - [src/routes/discover/](https://github.com/polaroi8d/cactoide/tree/main/src/routes/discover): Public events discovery page with search and filtering
+  - [src/routes/event/[id]/](https://github.com/polaroi8d/cactoide/tree/main/src/routes/event/[id]): Dynamic route for individual event pages
+    - `edit/`: Event editing functionality
+    - `invite/[token]/`: Invite-only event access via token
+  - [src/routes/instance/](https://github.com/polaroi8d/cactoide/tree/main/src/routes/instance): Federation instances status monitoring page
+  - [src/routes/api/](https://github.com/polaroi8d/cactoide/tree/main/src/routes/api): API endpoints
+    - `healthz/+server.ts`: Health check endpoint with response time
+    - `federation/events/+server.ts`: Returns public events for federation (requires FEDERATION_INSTANCE)
+    - `federation/info/+server.ts`: Returns instance name and public events count (requires FEDERATION_INSTANCE)
+
+### src/lib/
+Shared library code accessible via `$lib` alias throughout the application.
+
+- [src/lib/](https://github.com/polaroi8d/cactoide/tree/main/src/lib): Core library directory
+  - [src/lib/components/](https://github.com/polaroi8d/cactoide/tree/main/src/lib/components): Reusable Svelte components
+    - `Navbar.svelte`: Main navigation bar component
+    - `CalendarModal.svelte`: Calendar integration modal for iCal downloads
+  - [src/lib/database/](https://github.com/polaroi8d/cactoide/tree/main/src/lib/database): Database layer
+    - `schema.ts`: Drizzle ORM schema definitions (events, rsvps, invite_tokens tables)
+    - `db.ts`: Database connection and Drizzle instance setup
+    - `healthCheck.ts`: Database health check utilities
+  - [src/lib/i18n/](https://github.com/polaroi8d/cactoide/tree/main/src/lib/i18n): Internationalization
+    - `i18n.ts`: i18n initialization and translation function
+    - `messages.json`: Default English translations
+    - `it.json`: Italian translation file (example of additional language)
+  - `types.ts`: TypeScript type definitions (Event, RSVP, EventType, EventVisibility, LocationType, etc.)
+  - `dateHelpers.ts`: Date and time formatting utilities, time range filtering for events
+  - `calendarHelpers.ts`: iCal file generation and calendar service link creation (Google Calendar, Outlook, etc.)
+  - `fetchFederatedEvents.ts`: Federation logic for fetching events from other Cactoide instances
+  - `inviteTokenHelpers.ts`: Invite token generation and expiration calculation utilities
+  - `generateUserId.ts`: User ID generation for cookie-based user identification
+  - `logger.ts`: Pino-based logging configuration
+  - `index.ts`: Library entry point (currently placeholder)
+
+### src/
+Root source directory containing application configuration and entry points.
+
+- `app.html`: HTML template for the application
+- `app.css`: Global CSS styles and Tailwind imports
+- `app.d.ts`: TypeScript type declarations
+- `hooks.server.ts`: SvelteKit server hooks for request handling, user ID cookie management, and error handling
+
+### Root Level Directories
+
+- [database/](https://github.com/polaroi8d/cactoide/tree/main/database): Database initialization and migration files
+  - `init.sql`: Database schema initialization script (creates tables, enums, indexes)
+  - `seed.sql`: Sample data for development and testing
+  - [database/migrations/](https://github.com/polaroi8d/cactoide/tree/main/database/migrations): SQL migration files for schema changes
+- [static/](https://github.com/polaroi8d/cactoide/tree/main/static): Static assets served directly by the web server
+  - `favicon.ico`: Site favicon
+  - `robots.txt`: Search engine crawler directives
+  - `llms.txt`: This file - LLM-friendly project documentation
+- [scripts/](https://github.com/polaroi8d/cactoide/tree/main/scripts): Utility scripts
+  - `i18n-check.sh`: Translation file validation script
+- [docs/](https://github.com/polaroi8d/cactoide/tree/main/docs): Documentation assets
+  - `federation_example.png`: Screenshot example for federation documentation
+
+### Configuration Files
+
+- `federation.config.js`: Federation configuration (instance name and list of federated instance URLs)
+- `package.json`: Node.js dependencies and scripts
+- `svelte.config.js`: SvelteKit configuration (adapter, preprocessors)
+- `vite.config.ts`: Vite build tool configuration
+- `tailwind.config.js`: Tailwind CSS configuration
+- `tsconfig.json`: TypeScript compiler configuration
+- `eslint.config.js`: ESLint linting rules
+- `docker-compose.yml`: Docker Compose setup for local development with PostgreSQL
+- `Dockerfile`: Production Docker image configuration
+- `Makefile`: Development command shortcuts (db-only, i18n validation, etc.)
+
+## Configuration
+
+Key environment variables:
+- `DATABASE_URL`: PostgreSQL connection string
+- `FEDERATION_INSTANCE`: Set to `true` to enable federation API endpoints
+- `PUBLIC_LANDING_INFO`: Set to `false` to disable landing page and redirect to `/discover`
+
+## Optional
+
+- [docker-compose.yml](https://github.com/polaroi8d/cactoide/blob/main/docker-compose.yml): Docker Compose configuration for local development
+- [Dockerfile](https://github.com/polaroi8d/cactoide/blob/main/Dockerfile): Production Docker image configuration
+- [database/init.sql](https://github.com/polaroi8d/cactoide/blob/main/database/init.sql): Database initialization SQL
+- [database/migrations/](https://github.com/polaroi8d/cactoide/tree/main/database/migrations): Database migration files
+- [Makefile](https://github.com/polaroi8d/cactoide/blob/main/Makefile): Development commands and shortcuts
+
