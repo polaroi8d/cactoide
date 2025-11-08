@@ -22,7 +22,7 @@ help:
 	@echo "  logs            - Show logs from all services"
 	@echo "  db-clean        - Clean up all Docker resources"
 	@echo "  prune           - Clean up everything (containers, images, volumes)"
-	@echo "  i18n            - Validate translation files"
+	@echo "  i18n            - List missing keys in translation file (use FILE=path/to/file.json)"
 	@echo "  lint            - Lint the project"
 	@echo "  format          - Format the project"
 	@echo "  migrate-up      - Apply invite-only events migration"
@@ -94,8 +94,10 @@ format:
 	@echo "Formatting the project..."
 	npm run format
 
-#TODO: not working yet
+# List missing keys in a translation file
 i18n:
-	@echo "Validating translation files..."
-	@if [ -n "$(FILE)" ]; then \
-		./scripts/i18n-check.sh $(FILE); \
+	@if [ -z "$(FILE)" ]; then \
+		echo "Error: FILE variable is required. Example: make i18n FILE=src/lib/i18n/it.json"; \
+		exit 1; \
+	fi
+	@./scripts/i18n-check.sh --missing-only $(FILE)
