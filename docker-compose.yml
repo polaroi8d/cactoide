@@ -34,7 +34,7 @@ services:
     ports:
       - '${PORT:-5111}:3000'
     environment:
-      DATABASE_URL: ${DATABASE_URL}
+      DATABASE_URL: ${DATABASE_URL:-postgres://cactoide:cactoide_password@postgres:5432/cactoide_database}
       PORT: 3000
       HOSTNAME: ${HOSTNAME:-0.0.0.0}
     depends_on:
