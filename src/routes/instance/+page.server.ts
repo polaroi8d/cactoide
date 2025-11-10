@@ -1,6 +1,6 @@
 import type { PageServerLoad } from './$types';
 import { logger } from '$lib/logger';
-import federationConfig from '../../../federation.config.js';
+import federationConfig from '$lib/config/federation.config.js';
 
 interface InstanceInfo {
 	name: string;

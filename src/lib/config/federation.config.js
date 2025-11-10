@@ -1,9 +1,9 @@
 const config = {
 	name: 'Cactoide Genesis',
 	instances: [
-		{
-			url: 'cactoide.org'
-		}
+		// {
+		// 	url: 'cactoide.org'
+		// }
 		// {
 		// 	url: 'YOUR_INSTANCE_URL'
 		// }

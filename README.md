@@ -59,6 +59,17 @@ make db-only
 npm run dev -- --open
 ```
 
+#### Build the image in local
+
+```
+docker build \
+  --build-arg LOG_PRETTY=${LOG_PRETTY:-true} \
+  --build-arg LOG_LEVEL=${LOG_LEVEL:-trace} \
+  --build-arg PUBLIC_LANDING_INFO=${PUBLIC_LANDING_INFO:-true} \
+  --build-arg FEDERATION_INSTANCE=${FEDERATION_INSTANCE:-true} \
+  -t cactoide-example .
+```
+
 Your app will be available at `http://localhost:5173`. You can use the Makefile commands to run the application or the database, eg.: `make db-only`.
 
 Use the `database/seed.sql` if you want to populate your database with dummy data.
@@ -103,12 +114,12 @@ Your instance will automatically expose:
 To add your instance to the global federation list (so other instances can discover your events):
 
 1. Fork the [Cactoide repository](https://github.com/polaroi8d/cactoide)
-2. Add your instance URL to the `instances` array in [`federation.config.js`](https://github.com/polaroi8d/cactoide/blob/main/federation.config.js):
+2. Add your instance URL to the `instances` array in `federation.config.js`:
 3. Open a pull request to the main repository
 
 Once merged, your instance will appear in the federation network, and other instances will be able to discover and display your public events.
 
-You can view all registered federated instances in the main repository: [`federation.config.js`](https://github.com/polaroi8d/cactoide/blob/main/federation.config.js) file.
+You can view all registered federated instances in the main repository: `federation.config.js` file.
 
 ### Options
 
