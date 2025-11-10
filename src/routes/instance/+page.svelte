@@ -130,7 +130,7 @@
 
 		<p class="py-8 text-center text-slate-400">
 			{t('instance.description')}
-			<a href="#" class="text-violet-300/80">{t('instance.configFile')}</a>
+			{t('instance.configFile')}
 			{t('instance.file')}
 		</p>
 
