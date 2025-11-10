@@ -4,7 +4,7 @@ import { database } from '$lib/database/db';
 import { events } from '$lib/database/schema';
 import { eq, count } from 'drizzle-orm';
 import { logger } from '$lib/logger';
-import federationConfig from '../../../../../federation.config.js';
+import federationConfig from '$lib/config/federation.config.js';
 
 import { FEDERATION_INSTANCE } from '$env/static/private';
 

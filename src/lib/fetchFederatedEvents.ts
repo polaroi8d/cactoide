@@ -3,7 +3,7 @@ import { join } from 'path';
 import { logger } from '$lib/logger';
 import type { Event } from '$lib/types';
 
-import config from '../../federation.config.js';
+import config from '$lib/config/federation.config.js';
 
 console.log(config.instances);
 
