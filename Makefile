@@ -1,4 +1,4 @@
-.PHONY: help build up down db-only logs db-clean prune i18n lint format migrate-up migrate-down
+.PHONY: help build up down db-only db-seed logs db-clean prune i18n lint format migrate-up migrate-down
 
 # Database connection variables
 DB_HOST ?= localhost
@@ -19,6 +19,7 @@ help:
 	@echo "  up              - Start all services"
 	@echo "  down            - Stop all services"
 	@echo "  db-only         - Start only the database"
+	@echo "  db-seed         - Seed the database with sample data"
 	@echo "  logs            - Show logs from all services"
 	@echo "  db-clean        - Clean up all Docker resources"
 	@echo "  prune           - Clean up everything (containers, images, volumes)"
@@ -72,6 +73,17 @@ db-clean:
 db-only:
 	@echo "Starting only the database..."
 	docker compose up -d postgres
+
+# Seed the database with sample data
+db-seed:
+	@echo "Seeding database with sample data..."
+	@if [ -f "database/seed.sql" ]; then \
+		psql "$(DB_URL)" -f database/seed.sql && \
+		echo "Database seeded successfully!"; \
+	else \
+		echo "Seed file not found: database/seed.sql"; \
+		exit 1; \
+	fi
 
 # Show logs from all services
 logs:
