@@ -7,7 +7,7 @@ Like the cactus, great events bloom under any condition when managed with care. 
 <p align="center">
   <a href="https://cactoide.org/" target="blank">
     <picture>
-      <img alt="actoide" src="https://github.com/user-attachments/assets/30b87181-1e3b-49d0-869e-bef6dcf7f777" width="840">
+      <img alt="actoide" src="https://github.com/user-attachments/assets/a7f7a732-1279-486e-808c-1d2348c68780" width="840">
     </picture>
   </a>
 </p>
