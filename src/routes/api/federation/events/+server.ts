@@ -33,7 +33,6 @@ export const GET: RequestHandler = async () => {
 			federation: true,
 			attendee_limit: event.attendeeLimit,
 			visibility: event.visibility,
-			user_id: event.userId,
 			created_at: event.createdAt?.toISOString() || '',
 			updated_at: event.updatedAt?.toISOString() || ''
 		}));

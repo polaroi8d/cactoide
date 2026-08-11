@@ -7,6 +7,7 @@ import { logger } from '$lib/logger';
 
 export const load: PageServerLoad = async ({ params, cookies }) => {
 	const eventId = params.id;
+	const userId = cookies.get('cactoideUserId');
 
 	if (!eventId) {
 		throw error(404, 'EventId not found');
@@ -29,7 +30,6 @@ export const load: PageServerLoad = async ({ params, cookies }) => {
 		// Check if this is an invite-only event
 		if (event.visibility === 'invite-only') {
 			// For invite-only events, check if user is the event creator
-			const userId = cookies.get('cactoideUserId');
 			if (event.userId !== userId) {
 				// User is not the creator, redirect to a message about needing invite
 				throw error(403, 'This event requires an invite link to view');
@@ -48,7 +48,8 @@ export const load: PageServerLoad = async ({ params, cookies }) => {
 			type: event.type,
 			attendee_limit: event.attendeeLimit,
 			visibility: event.visibility,
-			user_id: event.userId,
+			// Never send raw user ids to the client — they are the credential
+			is_creator: !!userId && event.userId === userId,
 			created_at: event.createdAt?.toISOString() || new Date().toISOString(),
 			updated_at: event.updatedAt?.toISOString() || new Date().toISOString()
 		};
@@ -57,16 +58,13 @@ export const load: PageServerLoad = async ({ params, cookies }) => {
 			id: rsvp.id,
 			event_id: rsvp.eventId,
 			name: rsvp.name,
-			user_id: rsvp.userId,
+			is_mine: !!userId && rsvp.userId === userId,
 			created_at: rsvp.createdAt?.toISOString() || new Date().toISOString()
 		}));
 
-		const userId = cookies.get('cactoideUserId');
-
 		return {
 			event: transformedEvent,
-			rsvps: transformedRsvps,
-			userId: userId
+			rsvps: transformedRsvps
 		};
 	} catch (err) {
 		if (err instanceof Response) throw err; // This is the 404 error

@@ -30,7 +30,6 @@ export const load = async ({ cookies }) => {
 			type: event.type,
 			attendee_limit: event.attendeeLimit,
 			visibility: event.visibility,
-			user_id: event.userId,
 			created_at: event.createdAt?.toISOString() || new Date().toISOString(),
 			updated_at: event.updatedAt?.toISOString() || new Date().toISOString()
 		}));

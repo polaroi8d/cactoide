@@ -26,7 +26,6 @@ export const load: PageServerLoad = async () => {
 			type: event.type,
 			attendee_limit: event.attendeeLimit,
 			visibility: event.visibility,
-			user_id: event.userId,
 			created_at: event.createdAt?.toISOString(),
 			updated_at: event.updatedAt?.toISOString(),
 			federation: false // Add false for local events
