@@ -14,7 +14,7 @@ export interface Event {
 	type: EventType;
 	attendee_limit?: number;
 	visibility: EventVisibility;
-	user_id: string;
+	is_creator?: boolean; // Optional: absent on events fetched from federated instances
 	created_at: string;
 	updated_at: string;
 	federation?: boolean; // Optional: true if event is from a federated instance
@@ -25,7 +25,7 @@ export interface RSVP {
 	id: string;
 	event_id: string;
 	name: string;
-	user_id: string;
+	is_mine: boolean;
 	created_at: string;
 }
 

@@ -394,7 +394,7 @@
 					</div>
 
 					<!-- Invite Link Section (only for invite-only events and event creator) -->
-					{#if eventData.visibility === 'invite-only' && inviteToken && data.event.userId === data.userId}
+					{#if eventData.visibility === 'invite-only' && inviteToken}
 						<div class="rounded-sm border border-amber-500/30 bg-amber-900/20 p-4">
 							<div class="mb-3 flex items-center justify-between">
 								<h3 class="text-lg font-semibold text-amber-400">Invite Link</h3>

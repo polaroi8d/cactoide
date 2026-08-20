@@ -14,10 +14,7 @@ const config = {
 			// see "split" mode in https://github.com/sveltejs/kit/tree/main/packages/adapter-netlify
 			edge: false,
 			split: false
-		}),
-		csrf: {
-			checkOrigin: false
-		}
+		})
 	}
 };
 

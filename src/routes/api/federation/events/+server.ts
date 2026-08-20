@@ -5,11 +5,11 @@ import { events } from '$lib/database/schema';
 import { desc, eq } from 'drizzle-orm';
 import { logger } from '$lib/logger';
 
-import { FEDERATION_INSTANCE } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 
 export const GET: RequestHandler = async () => {
 	try {
-		if (!FEDERATION_INSTANCE) {
+		if (!env.FEDERATION_INSTANCE) {
 			return json({ error: 'Federation API is not enabled on this instance' }, { status: 403 });
 		}
 
@@ -33,7 +33,6 @@ export const GET: RequestHandler = async () => {
 			federation: true,
 			attendee_limit: event.attendeeLimit,
 			visibility: event.visibility,
-			user_id: event.userId,
 			created_at: event.createdAt?.toISOString() || '',
 			updated_at: event.updatedAt?.toISOString() || ''
 		}));

@@ -20,7 +20,6 @@
 
 	let errors: Record<string, string> = {};
 	let isSubmitting = false;
-	let currentUserId = '';
 
 	// Get today's date in YYYY-MM-DD format for min attribute
 	const today = new Date().toISOString().split('T')[0];
@@ -95,7 +94,6 @@
 					}}
 					class="space-y-6"
 				>
-					<input type="hidden" name="userId" value={currentUserId} />
 					<input type="hidden" name="type" value={eventData.type} />
 					<input type="hidden" name="visibility" value={eventData.visibility} />
 					<input type="hidden" name="location_type" value={eventData.location_type} />

@@ -3,7 +3,7 @@
 	import Navbar from '$lib/components/Navbar.svelte';
 	import { t } from '$lib/i18n/i18n.js';
 
-	let { data, children } = $props();
+	let { children } = $props();
 </script>
 
 <svelte:head>
@@ -28,12 +28,6 @@
 		<footer class="py-12">
 			<div class="container mx-auto px-4 text-center">
 				<div class="text-sm">
-					<p class="mb-4 text-gray-100/80">
-						{t('layout.userIdCookieText')}
-						<span class="font-bold text-violet-400"
-							>{data.cactoideUserId ? data.cactoideUserId : t('layout.firstTimeVisiting')}</span
-						>
-					</p>
 					<p>{t('layout.copyright')}</p>
 				</div>
 			</div>

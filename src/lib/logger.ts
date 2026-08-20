@@ -1,17 +1,8 @@
 import pino from 'pino';
-import { LOG_PRETTY, LOG_LEVEL } from '$env/static/private';
+import { env } from '$env/dynamic/private';
 
-try {
-	if (LOG_PRETTY && LOG_LEVEL) {
-		console.debug(
-			`Initializing logger with pretty logs: LOG_PRETTY: ${LOG_PRETTY} and LOG_LEVEL: ${LOG_LEVEL}`
-		);
-	}
-} catch (error) {
-	console.error('Error initializing logger', error);
-}
-
-const USE_PRETTY_LOGS = LOG_PRETTY === 'true';
+// ponytail: dynamic env so the build doesn't require these vars to be set
+const USE_PRETTY_LOGS = env.LOG_PRETTY === 'true';
 
 const transport = USE_PRETTY_LOGS
 	? {
@@ -33,7 +24,7 @@ const transport = USE_PRETTY_LOGS
 	: undefined;
 
 export const logger = pino({
-	level: LOG_LEVEL,
+	level: env.LOG_LEVEL ?? 'info',
 	transport
 });
 

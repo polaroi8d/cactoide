@@ -259,8 +259,6 @@
 	"layout": {
 		"defaultTitle": "Cactoide -",
 		"defaultDescription": "Crea e gestisci gli RSVP degli eventi",
-		"userIdCookieText": "Il tuo UserID memorizzato come cookie:",
-		"firstTimeVisiting": "Prima visita. Generazione di un nuovo UserID...",
 		"copyright": "© 2025 Cactoide"
 	}
 }

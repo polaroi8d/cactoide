@@ -8,6 +8,7 @@ import { isTokenValid } from '$lib/inviteTokenHelpers.js';
 export const load: PageServerLoad = async ({ params, cookies }) => {
 	const eventId = params.id;
 	const token = params.token;
+	const userId = cookies.get('cactoideUserId');
 
 	if (!eventId || !token) {
 		throw error(404, 'Event or token not found');
@@ -59,7 +60,8 @@ export const load: PageServerLoad = async ({ params, cookies }) => {
 			type: event.type,
 			attendee_limit: event.attendeeLimit,
 			visibility: event.visibility,
-			user_id: event.userId,
+			// Never send raw user ids to the client — they are the credential
+			is_creator: !!userId && event.userId === userId,
 			created_at: event.createdAt?.toISOString() || new Date().toISOString(),
 			updated_at: event.updatedAt?.toISOString() || new Date().toISOString()
 		};
@@ -68,16 +70,13 @@ export const load: PageServerLoad = async ({ params, cookies }) => {
 			id: rsvp.id,
 			event_id: rsvp.eventId,
 			name: rsvp.name,
-			user_id: rsvp.userId,
+			is_mine: !!userId && rsvp.userId === userId,
 			created_at: rsvp.createdAt?.toISOString() || new Date().toISOString()
 		}));
-
-		const userId = cookies.get('cactoideUserId');
 
 		return {
 			event: transformedEvent,
 			rsvps: transformedRsvps,
-			userId: userId,
 			inviteToken: {
 				id: inviteToken.id,
 				event_id: inviteToken.eventId,

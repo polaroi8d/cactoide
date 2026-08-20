@@ -1,5 +1,5 @@
-export const generateUserId = () => {
-	const userId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+import { randomUUID } from 'crypto';
 
-	return userId;
-};
+// This id is the only credential the app has — it must not be guessable,
+// and it must never be serialized to the client.
+export const generateUserId = () => 'user_' + randomUUID();

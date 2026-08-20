@@ -44,10 +44,13 @@ export const load: PageServerLoad = async ({ params, cookies }) => {
 		}
 	}
 
+	// Strip the owner id — it is the credential, and the load above already proved ownership
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	const { userId: _owner, ...eventRow } = event[0];
+
 	return {
-		event: event[0],
-		inviteToken,
-		userId
+		event: eventRow,
+		inviteToken
 	};
 };
 

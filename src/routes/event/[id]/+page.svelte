@@ -9,7 +9,7 @@
 	import type { CalendarEvent } from '$lib/calendarHelpers.js';
 	import { t } from '$lib/i18n/i18n.js';
 
-	export let data: { event: Event; rsvps: RSVP[]; userId: string };
+	export let data: { event: Event; rsvps: RSVP[] };
 	type FormDataLocal = { success?: boolean; error?: string; type?: 'add' | 'remove' | 'copy' };
 	export let form: FormDataLocal | undefined;
 
@@ -30,8 +30,7 @@
 	// Use server-side data
 	$: event = data.event;
 	$: rsvps = data.rsvps;
-	$: currentUserId = data.userId;
-	$: isEventCreator = event.user_id === currentUserId;
+	$: isEventCreator = event.is_creator ?? false;
 
 	// Create calendar event object when event data changes
 	$: if (event && browser) {
@@ -266,7 +265,6 @@
 							}}
 							class="space-y-4"
 						>
-							<input type="hidden" name="userId" value={currentUserId} />
 							<div>
 								<label for="attendeeName" class=" mb-2 block text-sm font-semibold">
 									{t('event.yourNameLabel')}
@@ -401,7 +399,7 @@
 											</div>
 										</div>
 
-										{#if attendee.user_id === currentUserId}
+										{#if attendee.is_mine}
 											<form
 												method="POST"
 												action="?/removeRSVP"

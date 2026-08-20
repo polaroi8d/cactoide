@@ -7,7 +7,6 @@
 	export let data: { events: Event[] };
 
 	let userEvents: Event[] = [];
-	let currentUserId = '';
 	let showDeleteModal = false;
 	let eventToDelete: Event | null = null;
 
@@ -28,7 +27,6 @@
 			// Use server-side action for deletion
 			const formData = new FormData();
 			formData.append('eventId', eventId);
-			formData.append('userId', currentUserId);
 
 			const response = await fetch('?/deleteEvent', {
 				method: 'POST',
